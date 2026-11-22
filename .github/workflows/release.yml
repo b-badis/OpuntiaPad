@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -41,12 +41,12 @@ jobs:
           echo "prerelease=$([[ -n "$PRE_NUM" ]] && echo true || echo false)" >> "$GITHUB_OUTPUT"
           echo "Version ${TAG#v} (code $CODE)"
 
-      - uses: actions/setup-java@v5
+      - uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: 21
 
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v6
         with:
           cache-read-only: true
 
@@ -93,12 +93,12 @@ jobs:
           cat release-notes.md
 
       - name: Attest build provenance
-        uses: actions/attest-build-provenance@v2
+        uses: actions/attest-build-provenance@v4
         with:
           subject-path: dist/opuntiapad-*
 
       - name: Publish GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           name: OpuntiaPad ${{ steps.version.outputs.name }}
           body_path: release-notes.md

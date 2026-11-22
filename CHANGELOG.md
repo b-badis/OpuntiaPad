@@ -7,6 +7,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 ## [Unreleased]
 
 ### Changed
+- New prickly-pear logo (cactus pad with .txt / JSON / YAML / SQL badges), themed-icon support, in-app logo and cactus-green colour palette.
 - GitHub Actions updated to their latest major versions.
 
 ### Fixed

@@ -49,6 +49,17 @@ Grammars and themes come from the `tm-grammars` / `tm-themes` npm packages. Edit
 
 Commit the regenerated files under `app/src/main/assets/textmate/` and `docs/THIRD_PARTY_GRAMMARS.md`.
 
+## App icon
+
+The logo (prickly-pear pad with file-type badges) is drawn in code by
+[`tools/generate-icons.py`](tools/generate-icons.py), which writes the adaptive launcher icon, the themed-icon
+silhouette, the in-app logo and `docs/images/icon.svg`. Edit the script, never the generated files:
+
+```bash
+python3 -m pip install fonttools shapely
+python3 tools/generate-icons.py
+```
+
 ## Translations
 
 See [docs/TRANSLATING.md](docs/TRANSLATING.md).

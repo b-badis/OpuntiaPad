@@ -12,28 +12,38 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import io.github.bbadis.opuntiapad.core.settings.ThemeMode
 
-private val Teal = Color(0xFF0E7C86)
-private val TealLight = Color(0xFF7FD6DE)
-private val Amber = Color(0xFFF2A541)
+// Brand palette inspired by the prickly pear (Opuntia): cactus green, fruit pink, desert sand.
+private val CactusGreen = Color(0xFF2D6A4F)
+private val CactusGreenLight = Color(0xFF7FD39B)
+private val PricklyPink = Color(0xFFC2185B)
+private val PricklyPinkLight = Color(0xFFFF8FB1)
 
 private val LightColors = lightColorScheme(
-    primary = Teal,
+    primary = CactusGreen,
     onPrimary = Color.White,
-    primaryContainer = Color(0xFFB9EEF2),
-    onPrimaryContainer = Color(0xFF002023),
-    secondary = Color(0xFF4A6366),
-    tertiary = Color(0xFF8A5A00),
-    tertiaryContainer = Color(0xFFFFDDB3),
+    primaryContainer = Color(0xFFB7F0CB),
+    onPrimaryContainer = Color(0xFF00210F),
+    secondary = Color(0xFF8A5A2B),
+    secondaryContainer = Color(0xFFFFE8C2),
+    onSecondaryContainer = Color(0xFF2E1500),
+    tertiary = PricklyPink,
+    onTertiary = Color.White,
+    tertiaryContainer = Color(0xFFFFD9E2),
+    onTertiaryContainer = Color(0xFF3E001D),
 )
 
 private val DarkColors = darkColorScheme(
-    primary = TealLight,
-    onPrimary = Color(0xFF00363B),
-    primaryContainer = Color(0xFF004F55),
-    onPrimaryContainer = Color(0xFFB9EEF2),
-    secondary = Color(0xFFB1CBCE),
-    tertiary = Amber,
-    tertiaryContainer = Color(0xFF693F00),
+    primary = CactusGreenLight,
+    onPrimary = Color(0xFF00391E),
+    primaryContainer = Color(0xFF14522F),
+    onPrimaryContainer = Color(0xFFB7F0CB),
+    secondary = Color(0xFFF4C48E),
+    secondaryContainer = Color(0xFF5B3A14),
+    onSecondaryContainer = Color(0xFFFFE8C2),
+    tertiary = PricklyPinkLight,
+    onTertiary = Color(0xFF5E1133),
+    tertiaryContainer = Color(0xFF8E0E3E),
+    onTertiaryContainer = Color(0xFFFFD9E2),
 )
 
 @Composable

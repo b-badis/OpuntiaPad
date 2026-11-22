@@ -1,0 +1,13 @@
+<p>OpuntiaPad est un éditeur de code et de texte rapide et convivial. Ouvrez vos fichiers YAML, JSON, SQL, XML, Markdown, logs et plus de 70 autres formats directement depuis votre gestionnaire de fichiers, votre messagerie ou votre application de chat.</p>
+<ul>
+<li>Coloration syntaxique de 73 langages (grammaires TextMate de VS Code) et 14 thèmes</li>
+<li>Ouverture des fichiers partagés par n'importe quelle application</li>
+<li>Détection automatique du langage</li>
+<li>Onglets, fichiers récents, rechercher/remplacer avec expressions régulières</li>
+<li>Numéros de ligne, aller à la ligne, retour à la ligne, zoom à deux doigts</li>
+<li>Barre de symboles (Tab, crochets…), raccourcis clavier</li>
+<li>Formatage JSON, outils d'encodage et de fins de ligne</li>
+<li>Téléphones, pliables et tablettes ; thèmes clair et sombre</li>
+<li>Anglais, français, arabe, espagnol, allemand</li>
+</ul>
+<p>Libre et open source. Sans publicité, sans pistage, sans permission Internet.</p>

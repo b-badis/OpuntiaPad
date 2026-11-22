@@ -1,0 +1,114 @@
+name: Release
+
+# Push a tag such as v1.0.0 (or v1.1.0-beta.1 for a pre-release) to publish a signed APK.
+on:
+  push:
+    tags: ['v*.*.*']
+
+permissions:
+  contents: write      # create the GitHub Release
+  id-token: write      # build provenance attestation
+  attestations: write
+
+jobs:
+  release:
+    name: Signed release
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Compute version from tag
+        id: version
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          if [[ ! "$TAG" =~ ^v([0-9]+)\.([0-9]+)\.([0-9]+)(-(alpha|beta|rc)\.([0-9]+))?$ ]]; then
+            echo "::error::Tag '$TAG' must look like v1.2.3 or v1.2.3-beta.1"; exit 1
+          fi
+          MAJOR=${BASH_REMATCH[1]}; MINOR=${BASH_REMATCH[2]}; PATCH=${BASH_REMATCH[3]}
+          PRE_NUM=${BASH_REMATCH[6]:-}
+          if (( MINOR > 99 || PATCH > 99 )) || [[ -n "$PRE_NUM" && "$PRE_NUM" -gt 98 ]]; then
+            echo "::error::minor/patch must be <= 99 and pre-release number <= 98"; exit 1
+          fi
+          # versionCode = MMmmpp·100 + (pre-release number, or 99 for a final release)
+          # e.g. 1.2.3-beta.2 -> 1020302, 1.2.3 -> 1020399 (always increasing).
+          SUFFIX=${PRE_NUM:-99}
+          CODE=$(( MAJOR * 1000000 + MINOR * 10000 + PATCH * 100 + SUFFIX ))
+          echo "name=${TAG#v}" >> "$GITHUB_OUTPUT"
+          echo "code=$CODE" >> "$GITHUB_OUTPUT"
+          echo "prerelease=$([[ -n "$PRE_NUM" ]] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+          echo "Version ${TAG#v} (code $CODE)"
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: true
+
+      - name: Decode signing key
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+        run: |
+          if [ -z "$KEYSTORE_BASE64" ]; then
+            echo "::error::Missing KEYSTORE_BASE64 secret. See docs/RELEASING.md to create the signing key and secrets."
+            exit 1
+          fi
+          echo "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/opuntiapad-release.jks"
+
+      - name: Test & build signed APK and App Bundle
+        env:
+          OPUNTIAPAD_KEYSTORE_FILE: ${{ runner.temp }}/opuntiapad-release.jks
+          OPUNTIAPAD_KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          OPUNTIAPAD_KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          OPUNTIAPAD_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          ./gradlew testDebugUnitTest assembleRelease bundleRelease \
+            -Popuntiapad.versionName=${{ steps.version.outputs.name }} \
+            -Popuntiapad.versionCode=${{ steps.version.outputs.code }}
+
+      - name: Verify signature & collect artifacts
+        run: |
+          APKSIGNER=$(ls -d "$ANDROID_HOME"/build-tools/*/ | sort -V | tail -1)apksigner
+          mkdir -p dist
+          cp app/build/outputs/apk/release/opuntiapad-release.apk "dist/opuntiapad-${{ steps.version.outputs.name }}.apk"
+          cp app/build/outputs/bundle/release/opuntiapad-release.aab "dist/opuntiapad-${{ steps.version.outputs.name }}.aab"
+          "$APKSIGNER" verify --verbose --print-certs "dist/opuntiapad-${{ steps.version.outputs.name }}.apk"
+          cd dist && sha256sum * > SHA256SUMS.txt && cat SHA256SUMS.txt
+
+      - name: Extract release notes from CHANGELOG.md
+        run: |
+          VERSION="${{ steps.version.outputs.name }}"
+          awk -v v="$VERSION" '
+            /^## \[/ { if (found) exit; if (index($0, "[" v "]")) { found=1; next } }
+            found { print }
+          ' CHANGELOG.md > release-notes.md
+          if [ ! -s release-notes.md ]; then
+            echo "_No CHANGELOG entry for $VERSION — see the auto-generated notes below._" > release-notes.md
+          fi
+          cat release-notes.md
+
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: dist/opuntiapad-*
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: OpuntiaPad ${{ steps.version.outputs.name }}
+          body_path: release-notes.md
+          generate_release_notes: true
+          prerelease: ${{ steps.version.outputs.prerelease }}
+          files: |
+            dist/opuntiapad-${{ steps.version.outputs.name }}.apk
+            dist/opuntiapad-${{ steps.version.outputs.name }}.aab
+            dist/SHA256SUMS.txt
+
+      - name: Clean up signing key
+        if: always()
+        run: rm -f "$RUNNER_TEMP/opuntiapad-release.jks"

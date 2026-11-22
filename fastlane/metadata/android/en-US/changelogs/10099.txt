@@ -1,0 +1,1 @@
+First public version: syntax highlighting for 73 languages, tabs, find & replace, zoom, 5 UI languages.

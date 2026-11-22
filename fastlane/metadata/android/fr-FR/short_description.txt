@@ -1,0 +1,1 @@
+Éditeur de code et texte : YAML, JSON, SQL, XML… avec coloration

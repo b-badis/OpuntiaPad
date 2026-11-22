@@ -1,0 +1,1 @@
+Première version publique : coloration de 73 langages, onglets, recherche/remplacement, zoom, 5 langues.

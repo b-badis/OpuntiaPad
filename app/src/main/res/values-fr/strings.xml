@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="untitled_name">Sans titre %1$d</string>
+
+    <string name="action_open">Ouvrir un fichier</string>
+    <string name="action_new">Nouveau fichier</string>
+    <string name="action_save">Enregistrer</string>
+    <string name="action_save_as">Enregistrer sous…</string>
+    <string name="action_close_tab">Fermer l’onglet</string>
+    <string name="action_undo">Annuler</string>
+    <string name="action_redo">Rétablir</string>
+    <string name="action_search">Rechercher et remplacer</string>
+    <string name="action_go_to_line">Aller à la ligne…</string>
+    <string name="action_select_all">Tout sélectionner</string>
+    <string name="action_format_json">Formater le JSON</string>
+    <string name="action_minify_json">Minifier le JSON</string>
+    <string name="action_language">Langage : %1$s</string>
+    <string name="action_encoding">Encodage : %1$s</string>
+    <string name="action_line_endings">Fins de ligne : %1$s</string>
+    <string name="action_read_only">Mode lecture seule</string>
+    <string name="action_word_wrap">Retour à la ligne</string>
+    <string name="action_zoom_in">Zoom avant</string>
+    <string name="action_zoom_out">Zoom arrière</string>
+    <string name="action_zoom_reset">Réinitialiser le zoom</string>
+    <string name="action_share">Partager</string>
+    <string name="action_settings">Paramètres</string>
+    <string name="action_about">À propos</string>
+    <string name="action_more">Plus d’options</string>
+    <string name="action_menu">Fichiers et onglets</string>
+    <string name="action_back">Retour</string>
+    <string name="action_cancel">Annuler</string>
+    <string name="action_go">Aller</string>
+    <string name="action_discard">Ignorer</string>
+    <string name="action_remove">Retirer de la liste</string>
+    <string name="action_clear_recents">Vider la liste</string>
+    <string name="action_indent">Indenter</string>
+    <string name="action_unindent">Désindenter</string>
+    <string name="action_move_left">Déplacer à gauche</string>
+    <string name="action_move_right">Déplacer à droite</string>
+    <string name="action_move_up">Monter</string>
+    <string name="action_move_down">Descendre</string>
+
+    <string name="home_title">Bienvenue dans OpuntiaPad</string>
+    <string name="home_subtitle">Ouvrez un fichier YAML, JSON, SQL, XML, Markdown, log ou tout autre fichier texte pour commencer.</string>
+    <string name="home_tip">Astuce : dans votre gestionnaire de fichiers, votre messagerie ou votre application de chat, choisissez « Ouvrir avec » ou « Partager » → OpuntiaPad pour ouvrir directement un fichier.</string>
+    <string name="recent_files">Fichiers récents</string>
+    <string name="open_tabs">Onglets ouverts</string>
+    <string name="no_recent_files">Aucun fichier récent pour l’instant.</string>
+
+    <string name="search_hint">Rechercher</string>
+    <string name="replace_hint">Remplacer par</string>
+    <string name="search_previous">Occurrence précédente</string>
+    <string name="search_next">Occurrence suivante</string>
+    <string name="search_close">Fermer la recherche</string>
+    <string name="search_toggle_replace">Afficher le remplacement</string>
+    <string name="search_match_case">Respecter la casse</string>
+    <string name="search_whole_word">Mot entier</string>
+    <string name="search_count">%1$d/%2$d</string>
+    <string name="search_no_results">Aucun résultat</string>
+    <string name="search_invalid_regex">Expression régulière invalide</string>
+    <string name="replace_one">Remplacer</string>
+    <string name="replace_all">Tout remplacer</string>
+
+    <string name="status_position">Ln %1$d, Col %2$d</string>
+    <string name="status_read_only">Lecture seule</string>
+
+    <string name="dialog_go_to_line_title">Aller à la ligne</string>
+    <string name="dialog_go_to_line_label">Numéro de ligne (1–%1$d)</string>
+    <string name="dialog_language_title">Langage de coloration</string>
+    <string name="dialog_language_search">Rechercher un langage</string>
+    <string name="dialog_encoding_title">Rouvrir avec l’encodage</string>
+    <string name="dialog_line_endings_title">Convertir les fins de ligne</string>
+    <string name="dialog_unsaved_title">Modifications non enregistrées</string>
+    <string name="dialog_unsaved_message">Enregistrer les modifications de « %1$s » avant de fermer ?</string>
+    <string name="dialog_exit_title">Quitter OpuntiaPad ?</string>
+    <string name="dialog_exit_message">Certains fichiers ont des modifications non enregistrées. Elles seront perdues si vous quittez maintenant.</string>
+    <string name="dialog_exit_confirm">Quitter sans enregistrer</string>
+    <string name="line_ending_lf">LF — Unix, Linux, macOS</string>
+    <string name="line_ending_crlf">CRLF — Windows</string>
+    <string name="line_ending_cr">CR — ancien Mac OS</string>
+
+    <string name="msg_saved">« %1$s » enregistré</string>
+    <string name="msg_save_failed">Échec de l’enregistrement : %1$s</string>
+    <string name="msg_open_failed">Impossible d’ouvrir le fichier : %1$s</string>
+    <string name="msg_permission_denied">L’accès à ce fichier n’est plus autorisé. Veuillez le rouvrir.</string>
+    <string name="msg_file_too_large">Ce fichier est trop volumineux (limite : %1$d Mo).</string>
+    <string name="msg_binary_file">« %1$s » semble être un fichier binaire — ouvert en lecture seule.</string>
+    <string name="msg_invalid_json">JSON invalide : %1$s (ligne %2$d)</string>
+    <string name="msg_save_before_reencode">Enregistrez ou annulez vos modifications avant de changer l’encodage.</string>
+    <string name="share_chooser_title">Partager le fichier</string>
+
+    <string name="settings_title">Paramètres</string>
+    <string name="settings_section_general">Général</string>
+    <string name="settings_section_appearance">Apparence</string>
+    <string name="settings_section_editor">Éditeur</string>
+    <string name="settings_section_typing">Saisie</string>
+    <string name="settings_app_language">Langue de l’application</string>
+    <string name="settings_language_system">Langue du système</string>
+    <string name="settings_theme">Thème</string>
+    <string name="settings_theme_system">Système</string>
+    <string name="settings_theme_light">Clair</string>
+    <string name="settings_theme_dark">Sombre</string>
+    <string name="settings_dynamic_color">Couleurs dynamiques</string>
+    <string name="settings_dynamic_color_summary">Utiliser les couleurs du fond d’écran (Android 12+)</string>
+    <string name="settings_light_editor_theme">Couleurs de l’éditeur (clair)</string>
+    <string name="settings_dark_editor_theme">Couleurs de l’éditeur (sombre)</string>
+    <string name="settings_font_size">Taille de police</string>
+    <string name="settings_font_size_value">%1$s sp</string>
+    <string name="settings_tab_size">Largeur de tabulation</string>
+    <string name="settings_use_spaces">Insérer des espaces au lieu de tabulations</string>
+    <string name="settings_word_wrap">Retour à la ligne automatique</string>
+    <string name="settings_word_wrap_summary">Couper les lignes longues à la largeur de l’écran</string>
+    <string name="settings_line_numbers">Numéros de ligne</string>
+    <string name="settings_pin_line_numbers">Épingler les numéros de ligne</string>
+    <string name="settings_pin_line_numbers_summary">Garder les numéros visibles lors du défilement horizontal</string>
+    <string name="settings_highlight_line">Surligner la ligne courante</string>
+    <string name="settings_whitespace">Afficher les espaces</string>
+    <string name="settings_sticky_scroll">Défilement adhérent</string>
+    <string name="settings_sticky_scroll_summary">Garder les blocs englobants visibles en haut</string>
+    <string name="settings_auto_close">Fermer automatiquement crochets et guillemets</string>
+    <string name="settings_auto_complete">Complétion de mots</string>
+    <string name="settings_auto_complete_summary">Suggérer des mots du fichier courant</string>
+    <string name="settings_symbol_bar">Barre de symboles</string>
+    <string name="settings_symbol_bar_summary">Afficher Tab et les symboles courants au-dessus du clavier</string>
+    <string name="settings_keep_screen_on">Garder l’écran allumé</string>
+
+    <string name="about_title">À propos</string>
+    <string name="about_version">Version %1$s</string>
+    <string name="about_description">OpuntiaPad est un éditeur de code et de texte libre et open source pour Android. Sans publicité, sans pistage, sans accès réseau.</string>
+    <string name="about_source_code">Code source</string>
+    <string name="about_report_issue">Signaler un problème</string>
+    <string name="about_license">Licence</string>
+    <string name="about_license_value">Licence Apache 2.0</string>
+    <string name="about_third_party">Logiciels tiers</string>
+    <string name="about_third_party_value">Sora Editor (LGPL-2.1), grammaires et thèmes TextMate (diverses licences open source), AndroidX et Jetpack Compose (Apache 2.0).</string>
+    <plurals name="status_selection">
+        <item quantity="one">(%1$d sélectionné)</item>
+        <item quantity="many">(%1$d sélectionnés)</item>
+        <item quantity="other">(%1$d sélectionnés)</item>
+    </plurals>
+    <plurals name="status_lines">
+        <item quantity="one">%1$d ligne</item>
+        <item quantity="many">%1$d lignes</item>
+        <item quantity="other">%1$d lignes</item>
+    </plurals>
+    <plurals name="about_languages_count">
+        <item quantity="one">%1$d langage pris en charge</item>
+        <item quantity="many">%1$d langages pris en charge</item>
+        <item quantity="other">%1$d langages pris en charge</item>
+    </plurals>
+</resources>

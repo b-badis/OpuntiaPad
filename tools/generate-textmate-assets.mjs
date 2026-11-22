@@ -135,6 +135,9 @@ const THEMES = [
 const { grammars: meta } = await import(pathToFileURL(path.join(grammarPkg, 'index.js')).href);
 const byName = new Map(meta.map((g) => [g.name, g]));
 
+// Grammars whose upstream repository has no license at all: never redistributed (see tools/license-overrides).
+const UNLICENSED = new Set(['glsl']);
+
 // Resolve embedded grammars (transitively), restricted to what tm-grammars ships.
 const wanted = new Set(LANGUAGES.map((l) => l.id));
 const queue = [...wanted];
@@ -142,7 +145,7 @@ while (queue.length) {
   const g = byName.get(queue.pop());
   if (!g) continue;
   for (const e of g.embedded ?? []) {
-    if (!wanted.has(e) && byName.has(e)) {
+    if (!wanted.has(e) && byName.has(e) && !UNLICENSED.has(e)) {
       wanted.add(e);
       queue.push(e);
     }
@@ -283,6 +286,43 @@ for (const t of THEMES) {
 catalog.sort((a, b) => a.name.localeCompare(b.name));
 fs.writeFileSync(path.join(out, 'languages.json'), JSON.stringify({ languages: registry }, null, 1));
 fs.writeFileSync(path.join(out, 'catalog.json'), JSON.stringify({ languages: catalog, themes: themeOut }, null, 1));
+
+// ---------------------------------------------------------------------------
+// License notices shipped inside the APK (shown in Settings → About → Open-source licenses):
+// the MIT license of the packages plus the upstream notice of every bundled grammar/theme file.
+function bundledNotices(pkgDir, bundledFiles, title, overridesDir) {
+  const notice = fs.readFileSync(path.join(pkgDir, 'NOTICE'), 'utf8');
+  const blocks = notice.split(/^=+\s*$/m).slice(1);
+  const filesOf = (block) => (block.match(/^Files:\s*(.+)$/m)?.[1] ?? '').split(',').map((f) => f.trim());
+  const kept = blocks.filter((block) => filesOf(block).some((f) => bundledFiles.has(f)));
+  // Hand-verified notices for files the package's NOTICE doesn't cover.
+  if (overridesDir) {
+    for (const f of fs.readdirSync(overridesDir).filter((n) => n.endsWith('.txt')).sort()) {
+      if (bundledFiles.has(f.replace(/\.txt$/, '.json'))) kept.push(fs.readFileSync(path.join(overridesDir, f), 'utf8'));
+    }
+  }
+  const covered = new Set(kept.flatMap(filesOf));
+  const missing = [...bundledFiles].filter((f) => !covered.has(f));
+  if (missing.length) {
+    console.error(`✗ No license notice for: ${missing.join(', ')}. Verify the upstream license and add it to tools/license-overrides/, or exclude the file.`);
+    process.exit(1);
+  }
+  const license = fs.readFileSync(path.join(pkgDir, 'LICENSE'), 'utf8').trim();
+  return `${title}\n${'='.repeat(title.length)}\n\n${license}\n\n` +
+    `Upstream notices for the bundled files (${kept.length} entries):\n\n` +
+    kept.map((b) => b.trim()).join('\n\n' + '-'.repeat(80) + '\n\n') + '\n';
+}
+const licensesDir = path.join(root, 'app/src/main/assets/licenses');
+fs.mkdirSync(licensesDir, { recursive: true });
+fs.writeFileSync(
+  path.join(licensesDir, 'textmate-grammars.txt'),
+  bundledNotices(grammarPkg, new Set(registry.map((r) => `${r.name}.json`)), 'TextMate grammars (tm-grammars package)',
+    path.join(root, 'tools/license-overrides')),
+);
+fs.writeFileSync(
+  path.join(licensesDir, 'textmate-themes.txt'),
+  bundledNotices(themePkg, new Set(themeOut.map((t) => `${t.id}.json`)), 'TextMate themes (tm-themes package)'),
+);
 
 const grammarVersion = JSON.parse(fs.readFileSync(path.join(grammarPkg, 'package.json'), 'utf8')).version;
 const themeVersion = JSON.parse(fs.readFileSync(path.join(themePkg, 'package.json'), 'utf8')).version;

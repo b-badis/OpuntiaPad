@@ -1,0 +1,21 @@
+OpuntiaPad
+Copyright 2026 b-badis and the OpuntiaPad contributors
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+It includes third-party software and data distributed under their own licenses:
+
+- Sora Editor (LGPL-2.1), Copyright (C) 2020-2025 Rosemoe
+  https://github.com/Rosemoe/sora-editor — used unmodified as a library; its source code is
+  available at that address.
+- Eclipse TM4E (EPL-2.0), Copyright (c) 2015-2017 Angelo ZERR and others — bundled in Sora's
+  language-textmate module. Source: https://github.com/eclipse/tm4e
+- Joni and JCodings (MIT), the JRuby project — https://github.com/jruby/joni
+- Gson (Apache-2.0), Copyright 2008 Google Inc.
+- AndroidX, Jetpack Compose, Material components and icons (Apache-2.0), The Android Open Source Project
+- Kotlin standard library and kotlinx.coroutines (Apache-2.0), JetBrains s.r.o. and contributors
+- 88 TextMate grammars and 14 themes from the tm-grammars / tm-themes packages (MIT,
+  Copyright (c) 2021 Pine Wu, (c) 2023 Anthony Fu), each under its upstream license.
+
+The full license texts and every upstream notice ship inside the app (Settings → About →
+Open-source licenses) and live in app/src/main/assets/licenses/. See docs/THIRD_PARTY_NOTICES.md.

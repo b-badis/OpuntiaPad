@@ -60,8 +60,7 @@
    "scopeName": "source.cpp",
    "grammar": "textmate/grammars/cpp.json",
    "embeddedLanguages": {
-    "source.regexp.python": "regexp",
-    "source.glsl": "glsl"
+    "source.regexp.python": "regexp"
    },
    "languageConfiguration": "textmate/config/cpp.json"
   },
@@ -149,14 +148,6 @@
    "grammar": "textmate/grammars/git-rebase.json",
    "embeddedLanguages": {
     "source.shell": "shellscript"
-   }
-  },
-  {
-   "name": "glsl",
-   "scopeName": "source.glsl",
-   "grammar": "textmate/grammars/glsl.json",
-   "embeddedLanguages": {
-    "source.c": "c"
    }
   },
   {

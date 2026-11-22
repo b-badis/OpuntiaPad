@@ -131,8 +131,10 @@
     <string name="about_report_issue">Informar de un problema</string>
     <string name="about_license">Licencia</string>
     <string name="about_license_value">Licencia Apache 2.0</string>
-    <string name="about_third_party">Software de terceros</string>
-    <string name="about_third_party_value">Sora Editor (LGPL-2.1), gramáticas y temas TextMate (diversas licencias de código abierto), AndroidX y Jetpack Compose (Apache 2.0).</string>
+    <string name="about_third_party_value">Sora Editor, Eclipse TM4E, Joni, Gson, AndroidX, Kotlin, gramáticas y temas TextMate…</string>
+    <string name="licenses_title">Licencias de código abierto</string>
+    <string name="licenses_intro">OpuntiaPad se basa en software y datos de código abierto. Toca un componente para leer su licencia y avisos de copyright.</string>
+    <string name="about_copyright">© 2026 b-badis y los colaboradores de OpuntiaPad · Licencia Apache 2.0</string>
     <plurals name="status_selection">
         <item quantity="one">(%1$d seleccionado)</item>
         <item quantity="many">(%1$d seleccionados)</item>

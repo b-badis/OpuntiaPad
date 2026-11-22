@@ -13,11 +13,12 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.bbadis.opuntiapad.ui.screens.AboutScreen
 import io.github.bbadis.opuntiapad.ui.screens.EditorScreen
+import io.github.bbadis.opuntiapad.ui.screens.LicensesScreen
 import io.github.bbadis.opuntiapad.ui.screens.SettingsScreen
 import io.github.bbadis.opuntiapad.ui.theme.OpuntiaPadTheme
 import io.github.bbadis.opuntiapad.ui.theme.isDarkTheme
 
-private enum class Screen { EDITOR, SETTINGS, ABOUT }
+private enum class Screen { EDITOR, SETTINGS, ABOUT, LICENSES }
 
 @Composable
 fun OpuntiaPadRoot(viewModel: MainViewModel) {
@@ -43,11 +44,18 @@ fun OpuntiaPadRoot(viewModel: MainViewModel) {
                     onUpdate = viewModel::updateSettings,
                     onBack = { screen = Screen.EDITOR },
                 )
-                Screen.ABOUT -> AboutScreen(viewModel.catalog.languages.size, onBack = { screen = Screen.EDITOR })
+                Screen.ABOUT -> AboutScreen(
+                    viewModel.catalog.languages.size,
+                    onOpenLicenses = { screen = Screen.LICENSES },
+                    onBack = { screen = Screen.EDITOR },
+                )
+                Screen.LICENSES -> LicensesScreen(onBack = { screen = Screen.ABOUT })
                 Screen.EDITOR -> Unit
             }
         }
         // Registered last so it takes precedence over the editor's own back handling.
-        BackHandler(enabled = screen != Screen.EDITOR) { screen = Screen.EDITOR }
+        BackHandler(enabled = screen != Screen.EDITOR) {
+            screen = if (screen == Screen.LICENSES) Screen.ABOUT else Screen.EDITOR
+        }
     }
 }

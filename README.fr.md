@@ -57,4 +57,6 @@ Les rapports de bugs, traductions et pull requests sont les bienvenus : voir [CO
 
 ## Licence
 
-[Apache 2.0](LICENSE). Composants tiers : [docs/THIRD_PARTY_NOTICES.md](docs/THIRD_PARTY_NOTICES.md).
+[Apache 2.0](LICENSE) — Copyright 2026 b-badis et les contributeurs d'OpuntiaPad ([NOTICE](NOTICE)).
+Composants tiers : [docs/THIRD_PARTY_NOTICES.md](docs/THIRD_PARTY_NOTICES.md) ; toutes les licences sont aussi
+consultables dans l'application (*À propos → Licences open source*).

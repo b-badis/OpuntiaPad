@@ -43,7 +43,7 @@ const val REPOSITORY_URL = "https://github.com/b-badis/OpuntiaPad"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AboutScreen(languageCount: Int, onBack: () -> Unit) {
+fun AboutScreen(languageCount: Int, onOpenLicenses: () -> Unit, onBack: () -> Unit) {
     val context = LocalContext.current
     val openUrl = { url: String ->
         runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, url.toUri())) }
@@ -97,10 +97,17 @@ fun AboutScreen(languageCount: Int, onBack: () -> Unit) {
                     onClick = { openUrl("$REPOSITORY_URL/blob/main/LICENSE") },
                 )
                 ListRow(
-                    headline = { Text(stringResource(R.string.about_third_party)) },
+                    headline = { Text(stringResource(R.string.licenses_title)) },
                     supporting = { Text(stringResource(R.string.about_third_party_value)) },
                     leading = { Icon(Icons.Outlined.Extension, null) },
-                    onClick = { openUrl("$REPOSITORY_URL/blob/main/docs/THIRD_PARTY_NOTICES.md") },
+                    onClick = onOpenLicenses,
+                )
+                Text(
+                    stringResource(R.string.about_copyright),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(top = 16.dp, start = 24.dp, end = 24.dp),
                 )
                 Spacer(Modifier.height(24.dp))
             }

@@ -95,4 +95,6 @@ and [docs/TRANSLATING.md](docs/TRANSLATING.md). By participating you agree to th
 ## License
 
 OpuntiaPad is licensed under the [Apache License 2.0](LICENSE).
-It bundles third-party software under their own licenses — see [docs/THIRD_PARTY_NOTICES.md](docs/THIRD_PARTY_NOTICES.md).
+Copyright 2026 b-badis and the OpuntiaPad contributors — see [NOTICE](NOTICE).
+It bundles third-party software and data under their own licenses — see [docs/THIRD_PARTY_NOTICES.md](docs/THIRD_PARTY_NOTICES.md);
+all license texts are also available in the app (*About → Open-source licenses*).

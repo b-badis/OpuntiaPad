@@ -50,4 +50,4 @@ Version numbers: `MINOR` and `PATCH` must stay ≤ 99.
 
 - **F-Droid**: the app has no proprietary dependencies, and store texts live in `fastlane/metadata/android`,
   the format F-Droid reads. Open a request at <https://gitlab.com/fdroid/rfp>.
-- **Google Play**: upload the `.aab` from a release (Play App Signing recommended).
+- **Google Play**: fully automated once configured — see [PLAY_STORE.md](PLAY_STORE.md).

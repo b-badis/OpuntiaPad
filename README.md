@@ -83,7 +83,8 @@ git tag v1.0.0
 git push origin v1.0.0
 ```
 
-The one-time signing setup is described in [docs/RELEASING.md](docs/RELEASING.md).
+The one-time signing setup is described in [docs/RELEASING.md](docs/RELEASING.md); publishing to Google Play
+is automated too — see [docs/PLAY_STORE.md](docs/PLAY_STORE.md). Privacy policy: [PRIVACY.md](PRIVACY.md).
 
 ## Contributing
 

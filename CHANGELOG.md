@@ -6,10 +6,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+### Changed
+- GitHub Actions updated to their latest major versions.
+
 ### Fixed
 - Crash when opening any file with several editor themes (incl. the default light theme): shorthand colours such as `#fff` are now normalised, and a broken theme falls back to default colours instead of crashing.
 
 ### Added
+- Optional automatic publishing to Google Play (internal/closed/production tracks, staged rollouts, R8 mapping upload); store listing graphics and privacy policy.
 - Automatic "Development build" pre-release (debug APK) published on every push to `main`.
 - Shared public debug signing key so development builds can update each other.
 

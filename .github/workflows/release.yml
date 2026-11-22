@@ -15,8 +15,11 @@ jobs:
     name: Signed release
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    env:
+      # Google Play publishing is optional: it runs only once the secret exists (docs/PLAY_STORE.md).
+      PLAY_ENABLED: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON != '' }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -41,12 +44,12 @@ jobs:
           echo "prerelease=$([[ -n "$PRE_NUM" ]] && echo true || echo false)" >> "$GITHUB_OUTPUT"
           echo "Version ${TAG#v} (code $CODE)"
 
-      - uses: actions/setup-java@v5
+      - uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: 21
 
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v6
         with:
           cache-read-only: true
 
@@ -93,12 +96,12 @@ jobs:
           cat release-notes.md
 
       - name: Attest build provenance
-        uses: actions/attest-build-provenance@v2
+        uses: actions/attest-build-provenance@v4
         with:
           subject-path: dist/opuntiapad-*
 
       - name: Publish GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           name: OpuntiaPad ${{ steps.version.outputs.name }}
           body_path: release-notes.md
@@ -108,6 +111,31 @@ jobs:
             dist/opuntiapad-${{ steps.version.outputs.name }}.apk
             dist/opuntiapad-${{ steps.version.outputs.name }}.aab
             dist/SHA256SUMS.txt
+
+      - name: Prepare Google Play release notes
+        if: env.PLAY_ENABLED == 'true'
+        run: |
+          # Play limits "What's new" to 500 characters per language; strip Markdown headings/links.
+          mkdir -p whatsnew
+          sed -e '/^###/d' -e 's/\[\([^]]*\)\]([^)]*)/\1/g' -e 's/`//g' release-notes.md | sed '/^$/d' | head -c 500 > whatsnew/whatsnew-en-US
+          cat whatsnew/whatsnew-en-US
+
+      - name: Publish to Google Play
+        if: env.PLAY_ENABLED == 'true'
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          packageName: io.github.bbadis.opuntiapad
+          releaseFiles: dist/opuntiapad-${{ steps.version.outputs.name }}.aab
+          releaseName: ${{ steps.version.outputs.name }}
+          # Pre-releases (vX.Y.Z-beta.N) go to internal testing; final versions to PLAY_TRACK (default: internal).
+          track: ${{ steps.version.outputs.prerelease == 'true' && 'internal' || vars.PLAY_TRACK || 'internal' }}
+          # Must be "draft" until the app has been published once from the Play Console.
+          status: ${{ vars.PLAY_RELEASE_STATUS || 'completed' }}
+          userFraction: ${{ vars.PLAY_ROLLOUT_FRACTION || '' }}
+          inAppUpdatePriority: 2
+          mappingFile: app/build/outputs/mapping/release/mapping.txt
+          whatsNewDirectory: whatsnew
 
       - name: Clean up signing key
         if: always()

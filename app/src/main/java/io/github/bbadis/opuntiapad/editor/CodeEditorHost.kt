@@ -1,6 +1,7 @@
 package io.github.bbadis.opuntiapad.editor
 
 import android.graphics.Typeface
+import android.util.Log
 import android.view.ViewGroup
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -24,6 +25,8 @@ import io.github.rosemoe.sora.langs.textmate.TextMateColorScheme
 import io.github.rosemoe.sora.langs.textmate.registry.ThemeRegistry
 import io.github.rosemoe.sora.widget.CodeEditor
 import io.github.rosemoe.sora.widget.component.EditorAutoCompletion
+import io.github.rosemoe.sora.widget.schemes.EditorColorScheme
+import kotlinx.coroutines.CancellationException
 
 /**
  * Hosts a single Sora [CodeEditor] and swaps the active [document] into it.
@@ -97,9 +100,17 @@ fun CodeEditorHost(
     }
 
     LaunchedEffect(editorTheme.id) {
-        TextMateSupport.applyTheme(editorTheme)
-        if (editor.colorScheme !is TextMateColorScheme) {
-            editor.colorScheme = TextMateColorScheme.create(ThemeRegistry.getInstance())
+        // A broken theme must never take the app down: fall back to the editor's default colours.
+        try {
+            TextMateSupport.applyTheme(editorTheme)
+            if (editor.colorScheme !is TextMateColorScheme) {
+                editor.colorScheme = TextMateColorScheme.create(ThemeRegistry.getInstance())
+            }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Log.e("CodeEditorHost", "Cannot apply theme ${editorTheme.id}", e)
+            if (editor.colorScheme is TextMateColorScheme) editor.colorScheme = EditorColorScheme()
         }
         editor.getComponent(EditorAutoCompletion::class.java).applyColorScheme()
         themeReady = true

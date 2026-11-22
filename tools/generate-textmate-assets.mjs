@@ -152,6 +152,15 @@ while (queue.length) {
 fs.rmSync(out, { recursive: true, force: true });
 for (const d of ['grammars', 'config', 'themes']) fs.mkdirSync(path.join(out, d), { recursive: true });
 
+/** Returns the colour as #RRGGBB or #RRGGBBAA, or null when it can't be represented. */
+function normalizeColor(value) {
+  if (typeof value !== 'string') return null;
+  const v = value.trim();
+  if (/^#[0-9a-f]{6}([0-9a-f]{2})?$/i.test(v)) return v;
+  if (/^#[0-9a-f]{3,4}$/i.test(v)) return '#' + [...v.slice(1)].map((ch) => ch + ch).join('');
+  return null;
+}
+
 const bracketPairs = [['{', '}'], ['[', ']'], ['(', ')']];
 function languageConfiguration(comment) {
   const cfg = {};
@@ -226,7 +235,25 @@ for (const t of THEMES) {
   }
   const json = JSON.parse(fs.readFileSync(file, 'utf8'));
   // Keep only what the editor uses: name, type, colors and tokenColors.
-  const slim = { name: t.name, type: t.dark ? 'dark' : 'light', colors: json.colors ?? {}, tokenColors: json.tokenColors ?? [] };
+  // Sora Editor only understands #RRGGBB / #RRGGBBAA, so shorthand colours are expanded and
+  // anything else (e.g. "inherit") is dropped — otherwise the editor throws "Unknown color".
+  const colors = {};
+  for (const [key, value] of Object.entries(json.colors ?? {})) {
+    const c = normalizeColor(value);
+    if (c) colors[key] = c;
+  }
+  const tokenColors = (json.tokenColors ?? []).map((rule) => {
+    if (!rule.settings) return rule;
+    const settings = { ...rule.settings };
+    for (const key of ['foreground', 'background']) {
+      if (key in settings) {
+        const c = normalizeColor(settings[key]);
+        if (c) settings[key] = c; else delete settings[key];
+      }
+    }
+    return { ...rule, settings };
+  });
+  const slim = { name: t.name, type: t.dark ? 'dark' : 'light', colors, tokenColors };
   fs.writeFileSync(path.join(out, 'themes', `${t.id}.json`), JSON.stringify(slim));
   themeOut.push({ id: t.id, name: t.name, dark: t.dark, path: `textmate/themes/${t.id}.json` });
 }

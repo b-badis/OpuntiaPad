@@ -1,0 +1,34 @@
+# Configuration de démonstration — bibliothèque de recettes
+%YAML 1.2
+---
+app:
+  nom: "Cuisine du Monde"
+  version: 2.4.1
+  actif: true
+  langues: [fr, en, ar]
+  base: &defaults
+    délai: 30s
+    tentatives: 3
+  cache:
+    <<: *defaults
+    taille: null
+
+recettes:
+  - id: couscous-légumes
+    portions: 4
+    temps: !duration 1h15m
+    chemin: !include recettes/couscous.yaml
+    ingrédients:
+      - semoule: 500 g
+      - pois chiches: 'une boîte'
+    étapes: |
+      Faire revenir les oignons.
+      Ajouter les légumes et le bouillon.
+    note: >
+      Servir chaud,
+      avec de la harissa.
+  - id: crêpes
+    portions: 6
+    prix: 3.50   # en euros
+    tags: !!set { sucré, rapide }
+...

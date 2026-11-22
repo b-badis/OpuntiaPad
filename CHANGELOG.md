@@ -6,6 +6,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+### Fixed
+- Crash when opening any file with several editor themes (incl. the default light theme): shorthand colours such as `#fff` are now normalised, and a broken theme falls back to default colours instead of crashing.
+
 ### Added
 - Automatic "Development build" pre-release (debug APK) published on every push to `main`.
 - Shared public debug signing key so development builds can update each other.

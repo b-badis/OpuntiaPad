@@ -6,7 +6,7 @@
 |---|---|---|
 | **CI** (`ci.yml`) | push to `main`, pull requests, manual | Lint, unit tests (incl. validation of all bundled grammars/themes), debug + R8 release builds, emulator tests, SonarQube Cloud analysis, "Development build" pre-release on `main` |
 | **Release** (`release.yml`) | tag `vX.Y.Z` | Signed APK/AAB, GitHub Release, provenance, optional Google Play upload ([PLAY_STORE.md](PLAY_STORE.md)) |
-| **Dependabot verification metadata** (`dependabot-verification.yml`) | Dependabot Gradle PR | Regenerates `gradle/verification-metadata.xml` for the new versions, pushes it to the PR and re-runs CI |
+| **Dependency verification metadata** (`dependency-verification.yml`) | Dependabot Gradle PR, or manual | Regenerates `gradle/verification-metadata.xml` for the new versions, pushes it to the PR and re-runs CI |
 | **Dependabot auto-merge** (`dependabot-auto-merge.yml`) | CI finished on a Dependabot PR | Merges minor/patch updates when CI is green; labels major updates for review |
 
 ## SonarQube Cloud (one-time setup, ~5 minutes)

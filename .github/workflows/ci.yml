@@ -175,6 +175,11 @@ jobs:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
 
-      - name: Tests, coverage, lint & analysis
+      - name: Tests, coverage & lint
         if: steps.config.outputs.enabled == 'true'
-        run: ./gradlew testDebugUnitTest createDebugUnitTestCoverageReport lintDebug sonar
+        run: ./gradlew testDebugUnitTest createDebugUnitTestCoverageReport lintDebug
+
+      - name: SonarQube Cloud analysis
+        if: steps.config.outputs.enabled == 'true'
+        # --info makes the scanner print its own messages (errors such as a wrong key or token).
+        run: ./gradlew sonar --info

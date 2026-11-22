@@ -1,6 +1,6 @@
 # Third-party notices
 
-OpuntiaPad is licensed under the [Apache License 2.0](../LICENSE) — copyright notice in [NOTICE](../NOTICE).
+OpuntiaPad is licensed under the [Apache License 2.0](../LICENSE) — Copyright 2026 Badis Barbouch and the OpuntiaPad contributors ([NOTICE](../NOTICE)).
 It includes or depends on the following software and data:
 
 | Component | License | In the APK |

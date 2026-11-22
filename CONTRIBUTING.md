@@ -31,6 +31,18 @@ OpuntiaPad version (Settings â†’ About), your Android version and device, and â€
   tracking libraries.
 - Add or update tests for behaviour changes; update `CHANGELOG.md` under `[Unreleased]`.
 
+## Adding or updating a dependency
+
+Gradle verifies the checksum of every dependency against `gradle/verification-metadata.xml`.
+After changing `gradle/libs.versions.toml`, regenerate it and commit the result:
+
+```bash
+./gradlew --write-verification-metadata sha256 lintDebug testDebugUnitTest createDebugUnitTestCoverageReport \
+  assembleDebug assembleRelease bundleRelease assembleDebugAndroidTest
+```
+
+(For Dependabot pull requests this is done automatically by CI.)
+
 ## Commits and pull requests
 
 - One topic per pull request, with a clear description and screenshots for UI changes.

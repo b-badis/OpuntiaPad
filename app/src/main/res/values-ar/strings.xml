@@ -134,7 +134,7 @@
     <string name="about_third_party_value">Sora Editor و Eclipse TM4E و Joni و Gson و AndroidX و Kotlin وقواعد وسمات TextMate…</string>
     <string name="licenses_title">تراخيص البرمجيات مفتوحة المصدر</string>
     <string name="licenses_intro">يعتمد OpuntiaPad على برمجيات وبيانات مفتوحة المصدر. اضغط على أي مكوّن لقراءة ترخيصه وإشعارات حقوق النشر.</string>
-    <string name="about_copyright">© 2026 ‏b-badis والمساهمون في OpuntiaPad · رخصة أباتشي 2.0</string>
+    <string name="about_copyright">© 2026 Badis Barbouch والمساهمون في OpuntiaPad · رخصة أباتشي 2.0</string>
     <plurals name="status_selection">
         <item quantity="zero">(لا شيء محدد)</item>
         <item quantity="one">(حرف واحد محدد)</item>

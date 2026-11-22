@@ -19,7 +19,7 @@ jobs:
       # Google Play publishing is optional: it runs only once the secret exists (docs/PLAY_STORE.md).
       PLAY_ENABLED: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON != '' }}
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
 
@@ -44,12 +44,12 @@ jobs:
           echo "prerelease=$([[ -n "$PRE_NUM" ]] && echo true || echo false)" >> "$GITHUB_OUTPUT"
           echo "Version ${TAG#v} (code $CODE)"
 
-      - uses: actions/setup-java@v6
+      - uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880 # v6.3.0
         with:
           distribution: temurin
           java-version: 21
 
-      - uses: gradle/actions/setup-gradle@v6
+      - uses: gradle/actions/setup-gradle@8da46b539cd8fe6ab27ca75128919a18d757604c # v6.4.1
         with:
           cache-read-only: true
 
@@ -96,12 +96,12 @@ jobs:
           cat release-notes.md
 
       - name: Attest build provenance
-        uses: actions/attest-build-provenance@v4
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
         with:
           subject-path: dist/opuntiapad-*
 
       - name: Publish GitHub Release
-        uses: softprops/action-gh-release@v3
+        uses: softprops/action-gh-release@8a0cd651e5b2365bd640854a3fa5dfc70e4875f3 # v3.0.4
         with:
           name: OpuntiaPad ${{ steps.version.outputs.name }}
           body_path: release-notes.md
@@ -122,7 +122,7 @@ jobs:
 
       - name: Publish to Google Play
         if: env.PLAY_ENABLED == 'true'
-        uses: r0adkll/upload-google-play@v1
+        uses: r0adkll/upload-google-play@e738b9dd8f2476ea806d921b64aacd24f34515a5 # v1.1.5
         with:
           serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
           packageName: io.github.bbadis.opuntiapad

@@ -1,8 +1,8 @@
 name: Dependabot auto-merge
 
 # Merges Dependabot pull requests automatically once the whole CI (lint, unit tests, release build,
-# emulator tests) has passed on them. Minor and patch updates only: major updates get a comment
-# and wait for a human review. No code from the pull request is checked out or executed here.
+# emulator tests, Sonar) has passed on their latest commit. Minor and patch updates only: major updates
+# get a label and a comment and wait for a human review. No code from the pull request is run here.
 on:
   workflow_run:
     workflows: [CI]
@@ -10,15 +10,16 @@ on:
 
 permissions:
   contents: write        # merge the pull request
-  pull-requests: write   # comment on major updates
+  pull-requests: write   # label/comment major updates
   actions: write         # re-run CI on main after the merge
 
 jobs:
   auto-merge:
+    # Only same-repository Dependabot branches; the PR author is verified below through the API.
     if: >-
-      github.event.workflow_run.event == 'pull_request' &&
       github.event.workflow_run.conclusion == 'success' &&
-      github.event.workflow_run.actor.login == 'dependabot[bot]'
+      github.event.workflow_run.head_repository.full_name == github.repository &&
+      startsWith(github.event.workflow_run.head_branch, 'dependabot/')
     runs-on: ubuntu-latest
     timeout-minutes: 5
     env:
@@ -29,17 +30,19 @@ jobs:
     steps:
       - name: Merge minor and patch updates
         run: |
-          PR_JSON=$(gh pr list --repo "$REPO" --head "$HEAD_BRANCH" --state open --json number,title,author,headRefOid --jq '.[0]')
-          if [ -z "$PR_JSON" ] || [ "$PR_JSON" = "null" ]; then echo "No open pull request for $HEAD_BRANCH."; exit 0; fi
+          OWNER=${REPO%%/*}
+          PR_JSON=$(gh api "repos/$REPO/pulls?state=open&head=$OWNER:$HEAD_BRANCH" --jq '.[0] // empty')
+          if [ -z "$PR_JSON" ]; then echo "No open pull request for $HEAD_BRANCH."; exit 0; fi
           NUMBER=$(jq -r .number <<<"$PR_JSON"); TITLE=$(jq -r .title <<<"$PR_JSON")
-          AUTHOR=$(jq -r .author.login <<<"$PR_JSON"); PR_SHA=$(jq -r .headRefOid <<<"$PR_JSON")
-          if [ "$AUTHOR" != "app/dependabot" ] && [ "$AUTHOR" != "dependabot[bot]" ]; then echo "Not a Dependabot PR ($AUTHOR)."; exit 0; fi
-          if [ "$PR_SHA" != "$HEAD_SHA" ]; then echo "PR #$NUMBER has new commits since this CI run; waiting for the next run."; exit 0; fi
+          AUTHOR_ID=$(jq -r .user.id <<<"$PR_JSON"); PR_SHA=$(jq -r .head.sha <<<"$PR_JSON")
+          # 49699333 = dependabot[bot]; ids can't be spoofed like names in event payloads.
+          if [ "$AUTHOR_ID" != "49699333" ]; then echo "PR #$NUMBER is not from Dependabot."; exit 0; fi
+          if [ "$PR_SHA" != "$HEAD_SHA" ]; then echo "PR #$NUMBER has newer commits than this CI run; waiting."; exit 0; fi
 
-          # "Bump foo from 1.2.3 to 2.0.0" (or "from v4 to v5"): refuse to auto-merge a new major version.
-          # Grouped PRs only contain minor/patch updates (see .github/dependabot.yml), majors come one by one.
+          # "Bump foo from 1.2.3 to 2.0.0": never auto-merge a new major version.
+          # Grouped PRs only contain minor/patch updates (see .github/dependabot.yml); majors come one by one.
           if [[ "$TITLE" =~ from\ v?([0-9]+)[^\ ]*\ to\ v?([0-9]+) ]] && [ "${BASH_REMATCH[1]}" != "${BASH_REMATCH[2]}" ]; then
-            if ! gh pr view "$NUMBER" --repo "$REPO" --json labels --jq '.labels[].name' | grep -qx "major-update"; then
+            if ! gh api "repos/$REPO/issues/$NUMBER/labels" --jq '.[].name' | grep -qx "major-update"; then
               gh label create major-update --repo "$REPO" --color B60205 --description "Major dependency update: needs review" 2>/dev/null || true
               gh pr edit "$NUMBER" --repo "$REPO" --add-label major-update
               gh pr comment "$NUMBER" --repo "$REPO" --body "CI passed, but this is a **major** version update (${BASH_REMATCH[1]} → ${BASH_REMATCH[2]}): not merged automatically. Please review the changelog and merge manually."

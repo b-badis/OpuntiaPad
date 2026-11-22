@@ -11,12 +11,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 - GitHub Actions updated to their latest major versions.
 
 ### Fixed
+- SonarQube Cloud quality gate: security findings fixed (pinned actions, non-forgeable bot checks, cleartext traffic disabled), coverage measured on unit-testable code.
 - License compliance: the GLSL grammar (no upstream license) is no longer bundled; grammars without a NOTICE entry were verified by hand, and the asset generator now refuses unlicensed grammars.
 - Markdown, PHP, Ruby, Perl, LaTeX, Vue, Svelte, Erlang, F#, HTTP and XML highlighting crashed the TextMate engine (malformed captures in the XML grammar); grammars are now sanitised at generation time and every bundled language is tested.
 - CI instrumented tests failing because of the above; failing instrumented tests are now printed in the CI log.
 - Crash when opening any file with several editor themes (incl. the default light theme): shorthand colours such as `#fff` are now normalised, and a broken theme falls back to default colours instead of crashing.
 
 ### Added
+- Supply-chain hardening: Gradle dependency verification (SHA-256), GitHub Actions pinned to commit SHAs, automatic verification-metadata updates on Dependabot PRs.
 - "Open-source licenses" screen (About) with all bundled license texts and upstream grammar/theme notices; NOTICE file with the copyright statement.
 - SonarQube Cloud analysis in CI with JaCoCo unit-test coverage and Android Lint import.
 - Automatic merge of Dependabot minor/patch updates once CI passes; majors are labelled for review.

@@ -1,0 +1,61 @@
+name: Dependabot verification metadata
+
+# Gradle verifies the checksum of every dependency (gradle/verification-metadata.xml), which Dependabot
+# doesn't update. On Dependabot pull requests, this regenerates the checksums for the new versions,
+# commits them to the PR branch and re-runs CI (the Dependabot auto-merge workflow then takes over).
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write   # push the updated metadata to the Dependabot branch
+  actions: write    # re-run CI on the updated branch
+
+concurrency:
+  group: dependabot-verification-${{ github.head_ref }}
+  cancel-in-progress: true
+
+jobs:
+  update-metadata:
+    # 49699333 is the immutable account id of dependabot[bot]; same-repository branches only.
+    if: >-
+      github.event.pull_request.user.id == 49699333 &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      startsWith(github.head_ref, 'dependabot/gradle/')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.head_ref }}
+          persist-credentials: false   # the build below never sees a write token
+
+      - uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880 # v6.3.0
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - uses: gradle/actions/setup-gradle@8da46b539cd8fe6ab27ca75128919a18d757604c # v6.4.1
+        with:
+          cache-read-only: true
+
+      - name: Regenerate dependency checksums
+        run: >-
+          ./gradlew --write-verification-metadata sha256
+          lintDebug testDebugUnitTest createDebugUnitTestCoverageReport
+          assembleDebug assembleRelease bundleRelease assembleDebugAndroidTest
+
+      - name: Commit, push and re-run CI
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH: ${{ github.head_ref }}
+        run: |
+          if git diff --quiet -- gradle/verification-metadata.xml; then
+            echo "Verification metadata already up to date."; exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "build(deps): update dependency verification metadata" -- gradle/verification-metadata.xml
+          git push "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:${BRANCH}"
+          # Pushes made with GITHUB_TOKEN don't trigger workflows: start CI on the branch explicitly.
+          gh workflow run ci.yml --repo "$GITHUB_REPOSITORY" --ref "$BRANCH"

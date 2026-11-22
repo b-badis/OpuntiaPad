@@ -6,6 +6,7 @@
 |---|---|---|
 | **CI** (`ci.yml`) | push to `main`, pull requests, manual | Lint, unit tests (incl. validation of all bundled grammars/themes), debug + R8 release builds, emulator tests, SonarQube Cloud analysis, "Development build" pre-release on `main` |
 | **Release** (`release.yml`) | tag `vX.Y.Z` | Signed APK/AAB, GitHub Release, provenance, optional Google Play upload ([PLAY_STORE.md](PLAY_STORE.md)) |
+| **Dependabot verification metadata** (`dependabot-verification.yml`) | Dependabot Gradle PR | Regenerates `gradle/verification-metadata.xml` for the new versions, pushes it to the PR and re-runs CI |
 | **Dependabot auto-merge** (`dependabot-auto-merge.yml`) | CI finished on a Dependabot PR | Merges minor/patch updates when CI is green; labels major updates for review |
 
 ## SonarQube Cloud (one-time setup, ~5 minutes)
@@ -45,3 +46,19 @@ Run locally: `SONAR_TOKEN=… ./gradlew testDebugUnitTest createDebugUnitTestCov
 - A failing update is never merged: fix it or close the pull request.
 
 To stop auto-merging, disable the *Dependabot auto-merge* workflow in the Actions tab.
+
+## Supply-chain protections
+
+- **Dependency verification**: Gradle checks the SHA-256 of every downloaded artifact against
+  `gradle/verification-metadata.xml`; a tampered or unexpected artifact fails the build.
+- **Pinned GitHub Actions**: every action is referenced by its full commit SHA (with the version in a comment);
+  Dependabot updates the SHA and the comment together.
+- **Least-privilege workflows**: read-only token by default; write permissions are granted per job only where
+  needed, the Dependabot workflows trust only the immutable bot account id, and the metadata job builds without
+  any write credential.
+
+## Coverage scope
+
+SonarQube measures unit-test coverage on the pure-Kotlin logic (`core/text`, `core/language` detection…).
+Android-framework code (Compose UI, Activity, the editor view, ContentResolver, DataStore) is excluded from
+coverage because it can't run in JVM unit tests; the instrumented tests exercise it on an emulator.

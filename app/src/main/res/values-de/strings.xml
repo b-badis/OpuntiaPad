@@ -134,7 +134,7 @@
     <string name="about_third_party_value">Sora Editor, Eclipse TM4E, Joni, Gson, AndroidX, Kotlin, TextMate-Grammatiken und -Designs…</string>
     <string name="licenses_title">Open-Source-Lizenzen</string>
     <string name="licenses_intro">OpuntiaPad basiert auf Open-Source-Software und -Daten. Tippe auf eine Komponente, um ihre Lizenz und Copyright-Hinweise zu lesen.</string>
-    <string name="about_copyright">© 2026 b-badis und die OpuntiaPad-Mitwirkenden · Apache-Lizenz 2.0</string>
+    <string name="about_copyright">© 2026 Badis Barbouch und die OpuntiaPad-Mitwirkenden · Apache-Lizenz 2.0</string>
     <plurals name="status_selection">
         <item quantity="one">(%1$d ausgewählt)</item>
         <item quantity="other">(%1$d ausgewählt)</item>

@@ -38,6 +38,14 @@ syntaxique, des onglets, la recherche/remplacement et le zoom à deux doigts.
 
 Nécessite Android 8.0 ou plus récent.
 
+## FAQ
+
+**OpuntiaPad n'apparaît pas quand je touche un fichier JSON / YAML / SQL.**
+Certains gestionnaires de fichiers ouvrent les fichiers texte dans leur propre lecteur sans demander. Utilisez
+**⋮ → Ouvrir avec** (ou **Partager → OpuntiaPad**). Si une autre application a été choisie *Toujours*, réinitialisez-la
+dans *Paramètres → Applications → (cette app) → Ouvrir par défaut → Effacer les valeurs par défaut*, puis choisissez
+OpuntiaPad → *Toujours*.
+
 ## Compiler
 
 ```bash

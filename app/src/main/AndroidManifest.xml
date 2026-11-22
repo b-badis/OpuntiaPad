@@ -73,6 +73,22 @@
                 <data android:mimeType="application/x-empty" />
                 <!-- Many providers report .yaml, .sql, .log, .env… as generic binary. -->
                 <data android:mimeType="application/octet-stream" />
+                <!-- Code extensions that Android's own MIME table maps to unrelated types
+                     (checked by OpenWithCoverageTest for every supported extension). -->
+                <data android:mimeType="video/mp2ts" />                               <!-- .ts TypeScript -->
+                <data android:mimeType="video/mp2t" />                                <!-- .mts -->
+                <data android:mimeType="application/rls-services+xml" />              <!-- .rs Rust -->
+                <data android:mimeType="application/vnd.dart" />
+                <data android:mimeType="application/x-msdos-program" />               <!-- .bat -->
+                <data android:mimeType="application/manifest+json" />                 <!-- .webmanifest -->
+                <data android:mimeType="application/vnd.wolfram.mathematica.package" /> <!-- .m Objective-C -->
+                <data android:mimeType="audio/x-scpls" />                             <!-- .pls PL/SQL -->
+                <data android:mimeType="application/x-mobipocket-ebook" />            <!-- .prc PL/SQL -->
+                <data android:mimeType="application/vnd.ibm.secure-container" />      <!-- .sc Scala -->
+                <data android:mimeType="application/xslt+xml" />
+                <data android:mimeType="image/svg+xml" />
+                <data android:mimeType="application/wsdl+xml" />
+                <data android:mimeType="application/vnd.google-earth.kml+xml" />
             </intent-filter>
 
             <!-- "Share → OpuntiaPad" (files or plain text). -->

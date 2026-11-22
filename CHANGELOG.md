@@ -11,6 +11,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 - GitHub Actions updated to their latest major versions.
 
 ### Fixed
+- "Open with OpuntiaPad" was not offered for 15 extensions that Android labels with unrelated MIME types (`.ts`, `.rs`, `.dart`, `.bat`, `.svg`, `.xsl`, `.m`, `.pls`…); an emulator test now checks every supported extension.
 - SonarQube Cloud quality gate: security findings fixed (pinned actions, non-forgeable bot checks, cleartext traffic disabled), coverage measured on unit-testable code.
 - License compliance: the GLSL grammar (no upstream license) is no longer bundled; grammars without a NOTICE entry were verified by hand, and the asset generator now refuses unlicensed grammars.
 - Markdown, PHP, Ruby, Perl, LaTeX, Vue, Svelte, Erlang, F#, HTTP and XML highlighting crashed the TextMate engine (malformed captures in the XML grammar); grammars are now sanitised at generation time and every bundled language is tested.

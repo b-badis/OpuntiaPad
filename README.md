@@ -52,6 +52,15 @@ mail or chat app, with real syntax highlighting, tabs, search & replace and pinc
 
 Requires Android 8.0 (API 26) or newer.
 
+## FAQ
+
+**OpuntiaPad isn't offered when I tap a JSON / YAML / SQL file.**
+Some file managers open text files in their own built-in viewer instead of asking. Use the file's **⋮ → Open with**
+(or **Share → OpuntiaPad**). If another app was set to open these files *Always*, reset it in
+*Settings → Apps → (that app) → Open by default → Clear defaults*, then choose OpuntiaPad → *Always*.
+OpuntiaPad registers every file type Android uses for its 73 languages — including the odd ones such as
+`.ts` (`video/mp2ts`) or `.rs` (`application/rls-services+xml`) — and an emulator test checks it on every build.
+
 ## Build from source
 
 Requirements: JDK 17+ (21 recommended) and the Android SDK (or Android Studio).

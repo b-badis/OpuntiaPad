@@ -12,6 +12,7 @@ mail or chat app, with real syntax highlighting, tabs, search & replace and pinc
 [![CI](https://github.com/b-badis/OpuntiaPad/actions/workflows/ci.yml/badge.svg)](https://github.com/b-badis/OpuntiaPad/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/b-badis/OpuntiaPad?include_prereleases&sort=semver)](https://github.com/b-badis/OpuntiaPad/releases)
 [![License](https://img.shields.io/github/license/b-badis/OpuntiaPad)](LICENSE)
+[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=b-badis_OpuntiaPad&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=b-badis_OpuntiaPad)
 ![Min Android](https://img.shields.io/badge/Android-8.0%2B-3DDC84?logo=android&logoColor=white)
 
 [**Download the latest APK**](https://github.com/b-badis/OpuntiaPad/releases/latest) · [Development build](https://github.com/b-badis/OpuntiaPad/releases/tag/dev) · [Français](README.fr.md)
@@ -70,7 +71,7 @@ cd OpuntiaPad
 - **[Sora Editor](https://github.com/Rosemoe/sora-editor)** — high-performance native code editor view (selection, pinch-zoom, large files).
 - **TextMate grammars & themes** from [shikijs/textmate-grammars-themes](https://github.com/shikijs/textmate-grammars-themes), bundled offline.
 - **DataStore** for settings, **Storage Access Framework** for files, **AppCompat** per-app languages.
-- **GitHub Actions**: lint, unit & emulator tests on every push/PR; signed APK + AAB, checksums and build provenance on every tag.
+- **GitHub Actions**: lint, unit & emulator tests and SonarQube Cloud analysis on every push/PR; signed APK + AAB, checksums and build provenance on every tag; Dependabot updates merged automatically when CI is green ([docs/QUALITY.md](docs/QUALITY.md)).
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for a tour of the code.
 

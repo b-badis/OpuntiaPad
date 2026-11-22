@@ -161,6 +161,28 @@ function normalizeColor(value) {
   return null;
 }
 
+/**
+ * tm4e expects every entry of a captures map to be a rule object. Some upstream grammars contain
+ * plain strings there (e.g. xml.json: captures { "name": "...", "end": "..." }), which throws a
+ * ClassCastException and breaks every grammar embedding it (Markdown, PHP, Ruby, Vue…).
+ */
+function sanitizeGrammar(node, id) {
+  if (Array.isArray(node)) return node.map((n) => sanitizeGrammar(n, id));
+  if (node === null || typeof node !== 'object') return node;
+  const result = {};
+  for (const [key, value] of Object.entries(node)) {
+    if (/^(captures|beginCaptures|endCaptures|whileCaptures)$/.test(key) && value && typeof value === 'object' && !Array.isArray(value)) {
+      const kept = Object.fromEntries(Object.entries(value).filter(([, v]) => v && typeof v === 'object' && !Array.isArray(v)));
+      const dropped = Object.keys(value).length - Object.keys(kept).length;
+      if (dropped) console.warn(`  ${id}: dropped ${dropped} invalid ${key} entr${dropped > 1 ? 'ies' : 'y'}`);
+      result[key] = sanitizeGrammar(kept, id);
+    } else {
+      result[key] = sanitizeGrammar(value, id);
+    }
+  }
+  return result;
+}
+
 const bracketPairs = [['{', '}'], ['[', ']'], ['(', ')']];
 function languageConfiguration(comment) {
   const cfg = {};
@@ -194,8 +216,8 @@ for (const id of [...wanted].sort()) {
   }
   const raw = fs.readFileSync(path.join(grammarPkg, 'grammars', `${id}.json`));
   total += raw.length;
-  // Re-serialise compactly to save a few bytes.
-  fs.writeFileSync(path.join(out, 'grammars', `${id}.json`), JSON.stringify(JSON.parse(raw)));
+  // Re-serialise compactly, dropping constructs the Android TextMate engine (tm4e) can't handle.
+  fs.writeFileSync(path.join(out, 'grammars', `${id}.json`), JSON.stringify(sanitizeGrammar(JSON.parse(raw), id)));
 
   const entry = catalogById.get(id);
   const embedded = {};

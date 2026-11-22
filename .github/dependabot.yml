@@ -1,20 +1,34 @@
+# Dependabot keeps dependencies up to date automatically:
+# - minor & patch updates are grouped into one PR per ecosystem and merged by
+#   .github/workflows/dependabot-auto-merge.yml once CI passes;
+# - major updates come as separate PRs, labelled "major-update", for manual review.
 version: 2
 updates:
-  - package-ecosystem: gradle
+  - package-ecosystem: gradle   # libs.versions.toml, plugins and the Gradle wrapper
     directory: /
     schedule:
       interval: weekly
-    groups:
-      androidx:
-        patterns: ["androidx.*"]
-      kotlin-and-agp:
-        patterns: ["org.jetbrains.kotlin*", "com.android.tools.build*", "com.android.application"]
+      day: monday
+      time: "06:00"
+      timezone: Africa/Tunis
     open-pull-requests-limit: 10
+    labels: [dependencies]
+    commit-message:
+      prefix: "build(deps)"
+    groups:
+      gradle-minor-and-patch:
+        update-types: [minor, patch]
 
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Africa/Tunis
+    labels: [dependencies]
+    commit-message:
+      prefix: "ci(deps)"
     groups:
-      actions:
-        patterns: ["*"]
+      actions-minor-and-patch:
+        update-types: [minor, patch]

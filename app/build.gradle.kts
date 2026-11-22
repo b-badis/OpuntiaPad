@@ -59,6 +59,7 @@ android {
 
     buildTypes {
         debug {
+            enableUnitTestCoverage = true
             applicationIdSuffix = ".debug"
             versionNameSuffix = "-debug"
         }
@@ -90,11 +91,35 @@ android {
         includeInBundle = false
     }
 
+    testOptions {
+        // android.* calls (e.g. Log in the TextMate engine) become no-ops in JVM unit tests.
+        unitTests.isReturnDefaultValues = true
+    }
+
     lint {
         abortOnError = true
         warningsAsErrors = false
         checkReleaseBuilds = true
         disable += setOf("MissingTranslation")
+    }
+}
+
+// The JVM tests validate the bundled TextMate assets: re-run them whenever the assets change.
+tasks.withType<Test>().configureEach {
+    inputs.dir("src/main/assets/textmate").withPathSensitivity(PathSensitivity.RELATIVE)
+}
+
+sonar {
+    properties {
+        property("sonar.sources", "src/main/java,src/main/AndroidManifest.xml")
+        property("sonar.tests", "src/test/java,src/androidTest/java")
+        property("sonar.androidLint.reportPaths", layout.buildDirectory.file("reports/lint-results-debug.xml").get().asFile.path)
+        property(
+            "sonar.coverage.jacoco.xmlReportPaths",
+            layout.buildDirectory.file("reports/coverage/test/debug/report.xml").get().asFile.path,
+        )
+        // Generated TextMate assets are third-party data, not code to analyse.
+        property("sonar.exclusions", "src/main/assets/**")
     }
 }
 

@@ -59,6 +59,23 @@ class TextMateAssetsJvmTest {
         }
     }
 
+    /** Regression test: malformed captures in xml.json broke 11 grammars (Markdown, PHP, Ruby…). */
+    @Test
+    fun everyCatalogLanguageLoadsAndTokenizes() {
+        val registry = registry()
+        val scopes = Regex("\"scopeName\":\\s*\"([^\"]+)\"").findAll(File(assets, "catalog.json").readText()).map { it.groupValues[1] }.toList()
+        assertTrue(scopes.size > 50)
+        val lines = listOf("key: \"value\" # comment", "{ \"a\": [1, 2.5, true, null] }", "SELECT * FROM t WHERE id = 1; -- x", "<a href=\"x\">y</a>", "")
+        val failures = scopes.mapNotNull { scope ->
+            runCatching {
+                val grammar = requireNotNull(registry.loadGrammar(scope)) { "grammar not found" }
+                var state: IStateStack? = null
+                lines.forEach { state = grammar.tokenizeLine(it, state, Duration.ofSeconds(5)).ruleStack }
+            }.exceptionOrNull()?.let { "$scope: $it" }
+        }
+        assertTrue("grammars failing:\n" + failures.joinToString("\n"), failures.isEmpty())
+    }
+
     @Test
     fun samplesTokenize() {
         val registry = registry()

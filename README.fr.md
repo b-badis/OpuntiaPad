@@ -10,7 +10,7 @@ Ouvrez vos fichiers YAML, JSON, SQL, XML, Markdown, logs et plus de 70 autres fo
 votre gestionnaire de fichiers, votre messagerie ou votre application de chat, avec une vraie coloration
 syntaxique, des onglets, la recherche/remplacement et le zoom à deux doigts.
 
-[**Télécharger le dernier APK**](https://github.com/b-badis/OpuntiaPad/releases/latest) · [English](README.md)
+[**Télécharger le dernier APK**](https://github.com/b-badis/OpuntiaPad/releases/latest) · [Version de développement](https://github.com/b-badis/OpuntiaPad/releases/tag/dev) · [English](README.md)
 
 </div>
 

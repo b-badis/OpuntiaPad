@@ -6,6 +6,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+### Added
+- Automatic "Development build" pre-release (debug APK) published on every push to `main`.
+- Shared public debug signing key so development builds can update each other.
+
 ## [0.1.0] - 2026-11-22
 
 ### Added

@@ -15,6 +15,7 @@ build/
 # Signing — never commit keys or their passwords
 *.jks
 *.keystore
+!app/debug.keystore
 keystore.properties
 
 # Misc

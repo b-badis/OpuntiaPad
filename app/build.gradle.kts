@@ -39,6 +39,14 @@ android {
     }
 
     signingConfigs {
+        // Shared, public debug key (not secret) so every dev build can update the previous one,
+        // whichever machine or CI runner built it.
+        getByName("debug") {
+            storeFile = file("debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
         if (hasReleaseSigning) {
             create("release") {
                 storeFile = rootProject.file(releaseStoreFile!!)

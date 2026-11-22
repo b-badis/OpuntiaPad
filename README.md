@@ -14,7 +14,7 @@ mail or chat app, with real syntax highlighting, tabs, search & replace and pinc
 [![License](https://img.shields.io/github/license/b-badis/OpuntiaPad)](LICENSE)
 ![Min Android](https://img.shields.io/badge/Android-8.0%2B-3DDC84?logo=android&logoColor=white)
 
-[**Download the latest APK**](https://github.com/b-badis/OpuntiaPad/releases/latest) · [Français](README.fr.md)
+[**Download the latest APK**](https://github.com/b-badis/OpuntiaPad/releases/latest) · [Development build](https://github.com/b-badis/OpuntiaPad/releases/tag/dev) · [Français](README.fr.md)
 
 </div>
 

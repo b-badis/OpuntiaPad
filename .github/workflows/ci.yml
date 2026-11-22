@@ -17,6 +17,8 @@ jobs:
   build:
     name: Lint, unit tests & debug APK
     runs-on: ubuntu-latest
+    permissions:
+      contents: write   # publish the "dev" pre-release on pushes to main
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v5
@@ -49,6 +51,21 @@ jobs:
           name: opuntiapad-debug-apk
           path: app/build/outputs/apk/debug/*.apk
           retention-days: 14
+
+      - name: Publish development build (latest main)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp app/build/outputs/apk/debug/opuntiapad-debug.apk opuntiapad-dev.apk
+          gh release delete dev --cleanup-tag --yes || true
+          gh release create dev opuntiapad-dev.apk \
+            --prerelease --latest=false --target "$GITHUB_SHA" \
+            --title "Development build" \
+            --notes "Automatic test build of the latest \`main\` (commit ${GITHUB_SHA::7}).
+
+          - Installs **next to** the official app (package \`io.github.bbadis.opuntiapad.debug\`) and updates itself with each new dev build.
+          - Not optimised and signed with a public debug key: use the versioned releases for everyday use."
 
       - name: Upload reports
         if: always()

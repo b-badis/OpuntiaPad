@@ -111,8 +111,7 @@ tasks.withType<Test>().configureEach {
 
 sonar {
     properties {
-        property("sonar.sources", "src/main/java,src/main/AndroidManifest.xml")
-        property("sonar.tests", "src/test/java,src/androidTest/java")
+        // Source and test folders are detected from the Android variants by the plugin itself.
         property("sonar.androidLint.reportPaths", layout.buildDirectory.file("reports/lint-results-debug.xml").get().asFile.path)
         property(
             "sonar.coverage.jacoco.xmlReportPaths",

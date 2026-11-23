@@ -11,6 +11,7 @@ import io.github.rosemoe.sora.widget.CodeEditor
 import io.github.rosemoe.sora.widget.EditorSearcher
 import io.github.rosemoe.sora.widget.SelectionMovement
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 
 data class SearchQuery(
@@ -89,10 +90,29 @@ class EditorController {
     fun unindent() = editor?.unindentSelection()
     fun move(movement: SelectionMovement) = editor?.moveSelection(movement)
 
-    fun insert(text: String, cursorOffset: Int = text.length) {
+    fun insert(text: String, cursorOffset: Int = text.length) = whenEditable { e -> e.insertText(text, cursorOffset) }
+
+    /**
+     * Runs [action] once the editor accepts edits. Sora's `isEditable` is also false for a moment
+     * while it lays out text in the background (e.g. right after opening a file): instead of
+     * silently dropping the user's action, retry shortly. A read-only document never becomes
+     * editable, so the action is dropped after [EDITABLE_TIMEOUT_MS].
+     */
+    private fun whenEditable(attempt: Int = 0, action: (CodeEditor) -> Unit) {
         val e = editor ?: return
-        if (!e.isEditable) return
-        e.insertText(text, cursorOffset)
+        when {
+            e.isEditable -> action(e)
+            attempt * RETRY_DELAY_MS < EDITABLE_TIMEOUT_MS -> e.postDelayed({ whenEditable(attempt + 1, action) }, RETRY_DELAY_MS)
+        }
+    }
+
+    private suspend fun awaitEditable(e: CodeEditor): Boolean {
+        var waited = 0L
+        while (!e.isEditable && waited < EDITABLE_TIMEOUT_MS) {
+            delay(RETRY_DELAY_MS)
+            waited += RETRY_DELAY_MS
+        }
+        return e.isEditable && editor === e
     }
 
     fun goToLine(lineNumber: Int) {
@@ -175,7 +195,7 @@ class EditorController {
      */
     suspend fun transform(transform: (String) -> String): Throwable? {
         val e = editor ?: return null
-        if (!e.isEditable) return null
+        if (!awaitEditable(e)) return null
         val c = e.cursor
         val selection = c.isSelected
         val startLine = if (selection) c.leftLine else 0
@@ -190,7 +210,7 @@ class EditorController {
             busy = false
         }
         val output = result.getOrElse { return it }
-        if (output == input || editor !== e) return null
+        if (output == input || !awaitEditable(e)) return null
         e.text.replace(startLine, startColumn, endLine, endColumn, output)
         if (selection) {
             val end = e.text.indexer.getCharPosition(e.text.getCharIndex(startLine, startColumn) + output.length)
@@ -227,9 +247,7 @@ class EditorController {
      * Applies a line-based edit to a small window around the selected lines (never the whole file),
      * as a single undoable change, then reselects the affected lines.
      */
-    private fun editLines(separator: String, edit: (List<String>, IntRange) -> Edit?) {
-        val e = editor ?: return
-        if (!e.isEditable) return
+    private fun editLines(separator: String, edit: (List<String>, IntRange) -> Edit?) = whenEditable { e ->
         val text = e.text
         val c = e.cursor
         val first = c.leftLine
@@ -238,12 +256,17 @@ class EditorController {
         val windowStart = (first - 1).coerceAtLeast(0)
         val windowEnd = (last + 1).coerceAtMost(text.lineCount - 1)
         val window = (windowStart..windowEnd).map { text.getLineString(it) }
-        val result = edit(window, (first - windowStart)..(last - windowStart)) ?: return
+        val result = edit(window, (first - windowStart)..(last - windowStart)) ?: return@whenEditable
         text.replace(windowStart, 0, windowEnd, text.getColumnCount(windowEnd), result.lines.joinToString(separator))
         val selFirst = windowStart + result.selectedLines.first
         val selLast = windowStart + result.selectedLines.last
         e.setSelectionRegion(selFirst, 0, selLast, text.getColumnCount(selLast))
         e.ensureSelectionVisible()
         refresh()
+    }
+
+    private companion object {
+        const val RETRY_DELAY_MS = 25L
+        const val EDITABLE_TIMEOUT_MS = 2_000L
     }
 }

@@ -6,6 +6,7 @@ import org.snakeyaml.engine.v2.api.Load
 import org.snakeyaml.engine.v2.api.LoadSettings
 import org.snakeyaml.engine.v2.common.FlowStyle
 import org.snakeyaml.engine.v2.exceptions.YamlEngineException
+import org.snakeyaml.engine.v2.schema.CoreSchema
 
 /**
  * JSON ↔ YAML conversion (SnakeYAML Engine, YAML 1.2). The result is a new document: comments in
@@ -15,7 +16,10 @@ object YamlJsonConverter {
 
     class ConversionException(message: String, cause: Throwable? = null) : IllegalArgumentException(message, cause)
 
+    // YAML 1.2 Core schema: "~"/"null" are null, ".inf" is a float… (the engine's default JSON schema
+    // would keep them as strings).
     private val loadSettings = LoadSettings.builder()
+        .setSchema(CoreSchema())
         .setAllowDuplicateKeys(false)
         .setCodePointLimit(64 * 1024 * 1024)
         .setMaxAliasesForCollections(200) // protects against "billion laughs" documents
@@ -46,6 +50,7 @@ object YamlJsonConverter {
             throw ConversionException(e.message?.lineSequence()?.firstOrNull() ?: "Invalid JSON", e)
         }
         val settings = DumpSettings.builder()
+            .setSchema(CoreSchema())
             .setDefaultFlowStyle(FlowStyle.BLOCK)
             .setIndent(indent)
             .setIndicatorIndent(indent)

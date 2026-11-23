@@ -121,7 +121,7 @@ sonar {
         // Generated TextMate assets are third-party data, not code to analyse.
         property("sonar.exclusions", "src/main/assets/**")
         // Unit-test coverage is measured on the pure-Kotlin logic. Code bound to the Android framework
-        // (Compose UI, Activity/Application, the Sora editor view, ContentResolver, DataStore, assets)
+        // (Compose UI, Activity/Application, the Sora editor view, ContentResolver, DataStore, files, assets)
         // cannot run in JVM unit tests and is exercised by the instrumented tests instead.
         property(
             "sonar.coverage.exclusions",
@@ -132,6 +132,7 @@ sonar {
                 "src/main/java/**/OpuntiaPadApp.kt",
                 "src/main/java/**/core/files/**",
                 "src/main/java/**/core/settings/**",
+                "src/main/java/**/core/session/**",
                 "src/main/java/**/core/language/LanguageCatalog.kt",
             ).joinToString(","),
         )

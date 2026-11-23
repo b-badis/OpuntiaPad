@@ -51,4 +51,25 @@ class YamlJsonConverterTest {
         assertThrows(YamlJsonConverter.ConversionException::class.java) { YamlJsonConverter.jsonToYaml("{a: 1}") }
         assertThrows(YamlJsonConverter.ConversionException::class.java) { YamlJsonConverter.yamlToJson("a: 1\na: 2\n") }
     }
+
+    @Test
+    fun `yaml scalars of every kind become valid json`() {
+        val yaml = "big: 12345678901234567890\nlong: 9876543210\nfloat: 1.5e3\nwhole: 2.0\ninf: .inf\nbin: !!binary aGk=\n" +
+            "date: 2026-11-23\nescapes: \"tab\\there \\\"q\\\" back\\\\slash\\u0001\"\nempty_list: []\nempty_map: {}\nkey with space: x\n"
+        val json = YamlJsonConverter.yamlToJson(yaml)
+        listOf(
+            "\"big\": 12345678901234567890", "\"long\": 9876543210", "\"float\": 1500.0", "\"whole\": 2.0", "\"inf\": null",
+            "\"bin\": \"aGk=\"", "\"date\": \"2026-11-23\"", "\"empty_list\": []", "\"empty_map\": {}", "\"key with space\": \"x\"",
+            "\"escapes\": \"tab\\there \\\"q\\\" back\\\\slash\\u0001\"",
+        ).forEach { assertTrue("missing $it in\n$json", json.contains(it)) }
+        // The output is strict JSON.
+        JsonFormatter.minify(json)
+    }
+
+    @Test
+    fun `scalar and empty documents`() {
+        assertEquals("\"hello\"\n", YamlJsonConverter.yamlToJson("hello"))
+        assertEquals("null\n", YamlJsonConverter.yamlToJson("~"))
+        assertEquals("[\n  1,\n  2\n]\n", YamlJsonConverter.yamlToJson("- 1\n- 2"))
+    }
 }

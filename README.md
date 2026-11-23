@@ -63,8 +63,8 @@ Requires Android 8.0 (API 26) or newer.
 Some file managers open text files in their own built-in viewer instead of asking. Use the file's **⋮ → Open with**
 (or **Share → OpuntiaPad**). If another app was set to open these files *Always*, reset it in
 *Settings → Apps → (that app) → Open by default → Clear defaults*, then choose OpuntiaPad → *Always*.
-OpuntiaPad registers every file type Android uses for its 73 languages — including the odd ones such as
-`.ts` (`video/mp2ts`) or `.rs` (`application/rls-services+xml`) — and an emulator test checks it on every build.
+OpuntiaPad accepts any local file in "Open with" (file managers label files inconsistently, sometimes not at all),
+so it is always in the list; binary files open read-only. An emulator test checks this on every build.
 
 ## Build from source
 

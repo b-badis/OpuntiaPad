@@ -33,4 +33,25 @@ class OpenWithCoverageTest {
         }
         assertTrue("Open with is not offered for: ${missing.joinToString()}", missing.isEmpty())
     }
+
+    /** File managers may label files with their own types, a wildcard, or nothing at all. */
+    @Test
+    fun anyLabelOrNoLabelOffersOpuntiaPad() {
+        val uri = "content://com.google.android.apps.nbu.files.provider/1/sample.yaml".toUri()
+        val cases = listOf("*/*", "application/x-yaml", "text/x-yaml", "application/vnd.unknown", "image/png", null)
+        val missing = cases.filter { type ->
+            val intent = Intent(Intent.ACTION_VIEW).apply { if (type == null) data = uri else setDataAndType(uri, type) }
+            context.packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY)
+                .none { it.activityInfo.packageName == context.packageName }
+        }
+        assertTrue("Open with is not offered for types: $missing", missing.isEmpty())
+    }
+
+    /** Web links must never open in the editor. */
+    @Test
+    fun webLinksAreNotClaimed() {
+        val intent = Intent(Intent.ACTION_VIEW, "https://example.com/data.json".toUri()).addCategory(Intent.CATEGORY_BROWSABLE)
+        val handlers = context.packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY)
+        assertTrue(handlers.none { it.activityInfo.packageName == context.packageName })
+    }
 }

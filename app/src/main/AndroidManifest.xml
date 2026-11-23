@@ -31,7 +31,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
-            <!-- "Open with…" from file managers, mail, chat, browsers' downloads… -->
+            <!-- "Open with…" from file managers, mail, chat, browsers' downloads…
+                 Any file type is accepted: file managers (e.g. Files by Google) don't label files the way
+                 Android's own MIME table does — or not at all — so a fixed list of types made OpuntiaPad
+                 disappear from their "Open with" lists. Only local content/file URIs: never web links.
+                 Binary files open read-only with a warning. -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <action android:name="android.intent.action.EDIT" />
@@ -39,56 +43,16 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="content" />
                 <data android:scheme="file" />
-                <data android:mimeType="text/*" />
-                <data android:mimeType="application/json" />
-                <data android:mimeType="application/ld+json" />
-                <data android:mimeType="application/geo+json" />
-                <data android:mimeType="application/x-ndjson" />
-                <data android:mimeType="application/yaml" />
-                <data android:mimeType="application/x-yaml" />
-                <data android:mimeType="application/toml" />
-                <data android:mimeType="application/x-toml" />
-                <data android:mimeType="application/xml" />
-                <data android:mimeType="application/xhtml+xml" />
-                <data android:mimeType="application/rss+xml" />
-                <data android:mimeType="application/atom+xml" />
-                <data android:mimeType="application/sql" />
-                <data android:mimeType="application/x-sql" />
-                <data android:mimeType="application/javascript" />
-                <data android:mimeType="application/x-javascript" />
-                <data android:mimeType="application/typescript" />
-                <data android:mimeType="application/x-sh" />
-                <data android:mimeType="application/x-shellscript" />
-                <data android:mimeType="application/x-python" />
-                <data android:mimeType="application/x-php" />
-                <data android:mimeType="application/x-httpd-php" />
-                <data android:mimeType="application/x-perl" />
-                <data android:mimeType="application/x-ruby" />
-                <data android:mimeType="application/x-tex" />
-                <data android:mimeType="application/x-latex" />
-                <data android:mimeType="application/x-desktop" />
-                <data android:mimeType="application/x-wine-extension-ini" />
-                <data android:mimeType="application/x-subrip" />
-                <data android:mimeType="application/graphql" />
-                <data android:mimeType="application/x-empty" />
-                <!-- Many providers report .yaml, .sql, .log, .env… as generic binary. -->
-                <data android:mimeType="application/octet-stream" />
-                <!-- Code extensions that Android's own MIME table maps to unrelated types
-                     (checked by OpenWithCoverageTest for every supported extension). -->
-                <data android:mimeType="video/mp2ts" />                               <!-- .ts TypeScript -->
-                <data android:mimeType="video/mp2t" />                                <!-- .mts -->
-                <data android:mimeType="application/rls-services+xml" />              <!-- .rs Rust -->
-                <data android:mimeType="application/vnd.dart" />
-                <data android:mimeType="application/x-msdos-program" />               <!-- .bat -->
-                <data android:mimeType="application/manifest+json" />                 <!-- .webmanifest -->
-                <data android:mimeType="application/vnd.wolfram.mathematica.package" /> <!-- .m Objective-C -->
-                <data android:mimeType="audio/x-scpls" />                             <!-- .pls PL/SQL -->
-                <data android:mimeType="application/x-mobipocket-ebook" />            <!-- .prc PL/SQL -->
-                <data android:mimeType="application/vnd.ibm.secure-container" />      <!-- .sc Scala -->
-                <data android:mimeType="application/xslt+xml" />
-                <data android:mimeType="image/svg+xml" />
-                <data android:mimeType="application/wsdl+xml" />
-                <data android:mimeType="application/vnd.google-earth.kml+xml" />
+                <data android:mimeType="*/*" />
+            </intent-filter>
+
+            <!-- Same, for apps that send a file without any type at all. -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.EDIT" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="content" />
+                <data android:scheme="file" />
             </intent-filter>
 
             <!-- "Open in OpuntiaPad" in the text-selection menu of other apps. -->

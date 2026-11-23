@@ -29,6 +29,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 - Syntax colouring is opt-in for very large files (YAML/Markdown > 256 KB, others > 2 MB), with a banner to turn it on.
 
 ### Fixed
+- OpuntiaPad was missing from "Open with" in Files by Google (and other file managers that label files with their own types, or none): any local file can now be opened; binary files open read-only. Web links are never claimed.
 - "Open with OpuntiaPad" was not offered for 15 extensions that Android labels with unrelated MIME types (`.ts`, `.rs`, `.dart`, `.bat`, `.svg`, `.xsl`, `.m`, `.pls`…); an emulator test now checks every supported extension.
 - SonarQube Cloud quality gate: security findings fixed (pinned actions, non-forgeable bot checks, cleartext traffic disabled), coverage measured on unit-testable code.
 - License compliance: the GLSL grammar (no upstream license) is no longer bundled; grammars without a NOTICE entry were verified by hand, and the asset generator now refuses unlicensed grammars.

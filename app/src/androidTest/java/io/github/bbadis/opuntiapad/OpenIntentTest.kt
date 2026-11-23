@@ -19,7 +19,9 @@ class OpenIntentTest {
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
 
     @Before
-    fun clearSession() = runBlocking { (context.applicationContext as OpuntiaPadApp).sessionStore.clear() }
+    fun clearSession() {
+        runBlocking { (context.applicationContext as OpuntiaPadApp).sessionStore.clear() }
+    }
 
     private fun launch(intent: Intent, check: (MainViewModel) -> Unit) {
         ActivityScenario.launch<MainActivity>(intent).use { scenario ->

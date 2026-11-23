@@ -1,5 +1,7 @@
 package io.github.bbadis.opuntiapad.editor
 
+import android.os.Handler
+import android.os.Looper
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -102,7 +104,8 @@ class EditorController {
         val e = editor ?: return
         when {
             e.isEditable -> action(e)
-            attempt * RETRY_DELAY_MS < EDITABLE_TIMEOUT_MS -> e.postDelayed({ whenEditable(attempt + 1, action) }, RETRY_DELAY_MS)
+            // A main-thread Handler, not View.postDelayed: the latter holds tasks until the view is attached.
+            attempt * RETRY_DELAY_MS < EDITABLE_TIMEOUT_MS -> mainHandler.postDelayed({ whenEditable(attempt + 1, action) }, RETRY_DELAY_MS)
         }
     }
 
@@ -266,6 +269,7 @@ class EditorController {
     }
 
     private companion object {
+        val mainHandler = Handler(Looper.getMainLooper())
         const val RETRY_DELAY_MS = 25L
         const val EDITABLE_TIMEOUT_MS = 2_000L
     }

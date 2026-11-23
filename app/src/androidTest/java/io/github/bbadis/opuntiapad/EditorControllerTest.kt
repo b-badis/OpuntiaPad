@@ -25,17 +25,23 @@ class EditorControllerTest {
     private lateinit var controller: EditorController
 
     @Before
-    fun setUp() = instrumentation.runOnMainSync {
-        editor = CodeEditor(instrumentation.targetContext)
-        // The copy/paste popup needs a window, which this off-screen editor doesn't have.
-        editor.getComponent(EditorTextActionWindow::class.java).isEnabled = false
-        controller = EditorController().also { it.attach(editor) }
+    fun setUp() {
+        instrumentation.runOnMainSync {
+            editor = CodeEditor(instrumentation.targetContext)
+            // The copy/paste popup needs a window, which this off-screen editor doesn't have.
+            editor.getComponent(EditorTextActionWindow::class.java).isEnabled = false
+            controller = EditorController().also { it.attach(editor) }
+        }
     }
 
     @After
-    fun tearDown() = instrumentation.runOnMainSync { editor.release() }
+    fun tearDown() {
+        instrumentation.runOnMainSync { editor.release() }
+    }
 
-    private fun main(block: () -> Unit) = instrumentation.runOnMainSync(block)
+    private fun main(block: () -> Unit) {
+        instrumentation.runOnMainSync(block)
+    }
 
     private fun setText(text: String) = main { editor.setText(Content(text)) }
 

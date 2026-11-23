@@ -462,10 +462,10 @@ private fun EditorTopBar(
             }
             if (document != null) {
                 if (medium) {
-                    IconButton(onClick = { controller.undo() }, enabled = controller.canUndo) {
+                    IconButton(onClick = { controller.undo() }, enabled = controller.canUndo && !document.readOnly) {
                         Icon(Icons.AutoMirrored.Filled.Undo, stringResource(R.string.action_undo))
                     }
-                    IconButton(onClick = { controller.redo() }, enabled = controller.canRedo) {
+                    IconButton(onClick = { controller.redo() }, enabled = controller.canRedo && !document.readOnly) {
                         Icon(Icons.AutoMirrored.Filled.Redo, stringResource(R.string.action_redo))
                     }
                 }
@@ -506,8 +506,8 @@ private fun EditorTopBar(
                         item(stringResource(R.string.action_close_tab), true, onClose)
                         HorizontalDivider()
                         if (!medium) {
-                            item(stringResource(R.string.action_undo), controller.canUndo) { controller.undo() }
-                            item(stringResource(R.string.action_redo), controller.canRedo) { controller.redo() }
+                            item(stringResource(R.string.action_undo), controller.canUndo && !document.readOnly) { controller.undo() }
+                            item(stringResource(R.string.action_redo), controller.canRedo && !document.readOnly) { controller.redo() }
                         }
                         item(stringResource(R.string.action_go_to_line), true, onGoToLine)
                         item(stringResource(R.string.action_select_all), true) { controller.selectAll() }
@@ -557,6 +557,11 @@ private fun handleShortcut(
     }
     if (!event.isCtrlPressed) return false
     return when (event.keyCode) {
+        // Ctrl+Z / Ctrl+Y are handled by the editor; Ctrl+Shift+Z is the other common redo shortcut.
+        KeyEvent.KEYCODE_Z if event.isShiftPressed && doc != null -> {
+            if (!doc.readOnly) controller.redo()
+            true
+        }
         KeyEvent.KEYCODE_SLASH -> { if (doc != null && !doc.readOnly) tools.toggleComment(doc); doc != null }
         KeyEvent.KEYCODE_D -> { if (doc != null && !doc.readOnly) tools.duplicateLines(doc); doc != null }
         KeyEvent.KEYCODE_F if event.isShiftPressed && doc != null && DocumentFormatter.canFormat(doc.language.id) -> {

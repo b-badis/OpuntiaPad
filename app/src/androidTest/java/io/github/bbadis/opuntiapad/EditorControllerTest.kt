@@ -94,4 +94,25 @@ class EditorControllerTest {
         main { editor.undo() }
         assertText("keep\nhello world\nkeep")
     }
+
+    @Test
+    fun undoRedoThroughController() {
+        setText("one")
+        main {
+            editor.setSelection(0, 3)
+            controller.insert(" two")
+        }
+        assertText("one two")
+        main {
+            controller.refresh()
+            assertEquals(true, controller.canUndo)
+            controller.undo()
+        }
+        assertText("one")
+        main {
+            assertEquals(true, controller.canRedo)
+            controller.redo()
+        }
+        assertText("one two")
+    }
 }

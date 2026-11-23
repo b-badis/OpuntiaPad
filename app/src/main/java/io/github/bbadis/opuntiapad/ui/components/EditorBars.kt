@@ -18,6 +18,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardTab
+import androidx.compose.material.icons.automirrored.filled.Redo
+import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
@@ -84,6 +86,10 @@ fun SymbolBar(
                 item {
                     SymbolIcon(Icons.AutoMirrored.Filled.KeyboardTab, R.string.action_unindent, Modifier.rotate(180f)) { controller.unindent() }
                 }
+                // Undo/redo first: the most used actions, always within thumb reach above the keyboard.
+                item { SymbolIcon(Icons.AutoMirrored.Filled.Undo, R.string.action_undo, enabled = controller.canUndo) { controller.undo() } }
+                item { SymbolIcon(Icons.AutoMirrored.Filled.Redo, R.string.action_redo, enabled = controller.canRedo) { controller.redo() } }
+                item { VerticalDivider(Modifier.height(24.dp).padding(horizontal = 4.dp)) }
                 item { SymbolIcon(Icons.AutoMirrored.Outlined.Comment, R.string.tools_toggle_comment, onClick = onToggleComment) }
                 item { SymbolIcon(Icons.Outlined.ContentCopy, R.string.tools_duplicate_line, onClick = onDuplicate) }
                 item { SymbolIcon(Icons.Outlined.ArrowUpward, R.string.tools_move_up) { onMove(-1) } }
@@ -110,8 +116,8 @@ fun SymbolBar(
 }
 
 @Composable
-private fun SymbolIcon(icon: ImageVector, label: Int, modifier: Modifier = Modifier, onClick: () -> Unit) {
-    IconButton(onClick = onClick, modifier = Modifier.size(44.dp)) {
+private fun SymbolIcon(icon: ImageVector, label: Int, modifier: Modifier = Modifier, enabled: Boolean = true, onClick: () -> Unit) {
+    IconButton(onClick = onClick, enabled = enabled, modifier = Modifier.size(44.dp)) {
         Icon(icon, contentDescription = stringResource(label), modifier = modifier)
     }
 }

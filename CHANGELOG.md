@@ -7,6 +7,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 ## [Unreleased]
 
 ### Added
+- Undo and redo buttons at the start of the symbol bar (always visible above the keyboard); `Ctrl+Shift+Z` also redoes.
 - Tools sheet: format JSON/XML/SQL, minify JSON/XML, JSON ↔ YAML conversion, sort/dedupe/trim lines, case changes, tabs ↔ spaces, Base64/URL encode-decode, checksums. Works on the selection or the whole document, as a single undo step, off the main thread.
 - Line actions: comment/uncomment, duplicate, move up/down (symbol bar and `Ctrl+/`, `Ctrl+D`, `Alt+↑/↓`); `Ctrl+Shift+F` formats.
 - Tabs and unsaved changes are restored after Android closes the app (setting “Reopen files on launch”).

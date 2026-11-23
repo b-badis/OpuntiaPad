@@ -28,7 +28,7 @@ mail or chat app, with real syntax highlighting, tabs, search & replace and pinc
 | 📂 **Opens files from any app** | “Open with…” and “Share → OpuntiaPad” from file managers, Gmail, Outlook, WhatsApp, Telegram, Drive, browsers' downloads…, “Open in OpuntiaPad” on selected text, and the system file picker. |
 | 🎨 **Real syntax highlighting** | 73 languages powered by VS Code's TextMate grammars: YAML, JSON/JSONC/JSON5, SQL & PL/SQL, XML, HTML, CSS, Markdown, Python, Java, Kotlin, JS/TS, Go, Rust, C/C++, C#, PHP, Shell, PowerShell, Dockerfile, Terraform, TOML, INI/properties, `.env`, logs, CSV… |
 | 🧠 **Automatic language detection** | From the file name (`Dockerfile`, `.bashrc`…), extension, MIME type or the content itself (JSON, YAML, SQL, XML, shebangs…). Can be changed manually at any time. |
-| ✏️ **Real editing** | Undo/redo per file, selection handles, indent/unindent, auto-indent, auto-closing brackets, optional word completion, Tab & symbol bar above the keyboard. |
+| ✏️ **Real editing** | Undo/redo per file (500 steps, buttons in the symbol bar), selection handles, indent/unindent, auto-indent, auto-closing brackets, optional word completion, Tab & symbol bar above the keyboard. |
 | 🔎 **Find & replace** | Match case, whole word, regular expressions with `$1` groups in replacements, match counter, replace one / all. |
 | 🪄 **Tools** | Format JSON, XML and SQL; minify JSON/XML; convert JSON ↔ YAML (in a new tab); sort lines, remove duplicates, trim spaces; change case; tabs ↔ spaces; Base64 & URL encode/decode; SHA-256 / SHA-1 / MD5 checksums. Applies to the selection or the whole document, in one undo step. |
 | 🧩 **Line actions** | Comment/uncomment (per language), duplicate and move lines — from the symbol bar or `Ctrl+/`, `Ctrl+D`, `Alt+↑/↓`. |
@@ -46,7 +46,7 @@ mail or chat app, with real syntax highlighting, tabs, search & replace and pinc
 
 `Ctrl+S` save · `Ctrl+Shift+S` save as · `Ctrl+O` open · `Ctrl+N` new · `Ctrl+W` close tab · `Ctrl+Tab` next tab ·
 `Ctrl+F` find · `Ctrl+Shift+F` format · `Ctrl+/` comment · `Ctrl+D` duplicate line · `Alt+↑/↓` move line ·
-`Ctrl+G` go to line · `Ctrl +/-` zoom · `Ctrl+Z/Y` undo/redo · `Ctrl+A/C/X/V`
+`Ctrl+G` go to line · `Ctrl +/-` zoom · `Ctrl+Z` undo · `Ctrl+Y` / `Ctrl+Shift+Z` redo · `Ctrl+A/C/X/V`
 
 ## Install
 

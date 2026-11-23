@@ -27,7 +27,9 @@ class TextMateAssetsTest {
         assertTrue("grammars failed to load", TextMateSupport.awaitReady())
         val samples = listOf("key: \"value\" # comment", "{ \"a\": [1, 2.5, true, null] }", "SELECT * FROM t WHERE id = 1; -- x", "")
         for (language in catalog.languages) {
-            val grammar = GrammarRegistry.getInstance().findGrammar(language.scopeName!!)
+            val scopeName = requireNotNull(language.scopeName)
+            assertTrue("cannot load ${language.id}", TextMateSupport.ensureGrammarLoaded(scopeName))
+            val grammar = GrammarRegistry.getInstance().findGrammar(scopeName)
             assertNotNull("missing grammar for ${language.id}", grammar)
             var state: IStateStack? = null
             for (line in samples) {

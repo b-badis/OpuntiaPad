@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+    <!-- MainActivity only reads a Uri (or text) from incoming VIEW/SEND/PROCESS_TEXT intents and opens it
+         as a document; no intent is ever re-launched. The interprocedural check flags the Uri reaching
+         a permission check (checkCallingOrSelfUriPermission) as a "launch": a false positive. -->
+    <issue id="UnsafeIntentLaunch">
+        <ignore path="src/main/java/io/github/bbadis/opuntiapad/MainActivity.kt" />
+    </issue>
+</lint>

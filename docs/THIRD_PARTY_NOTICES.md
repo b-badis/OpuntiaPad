@@ -9,6 +9,7 @@ It includes or depends on the following software and data:
 | [Eclipse TM4E](https://github.com/eclipse/tm4e) (bundled in Sora's TextMate module) — © Angelo ZERR and others | EPL-2.0 | ✓ |
 | [Joni](https://github.com/jruby/joni) / [JCodings](https://github.com/jruby/jcodings) — JRuby project | MIT | ✓ |
 | [Gson](https://github.com/google/gson) — © 2008 Google Inc. | Apache-2.0 | ✓ |
+| [SnakeYAML Engine](https://bitbucket.org/snakeyaml/snakeyaml-engine) — © 2018 SnakeYAML (JSON ↔ YAML conversion) | Apache-2.0 | ✓ |
 | AndroidX, Jetpack Compose, Material components & icons — The Android Open Source Project | Apache-2.0 | ✓ |
 | Kotlin standard library & kotlinx.coroutines — JetBrains and contributors | Apache-2.0 | ✓ |
 | 88 TextMate grammars and 14 themes via [shikijs/textmate-grammars-themes](https://github.com/shikijs/textmate-grammars-themes) | MIT (packaging) + each upstream license, see [THIRD_PARTY_GRAMMARS.md](THIRD_PARTY_GRAMMARS.md) | ✓ |

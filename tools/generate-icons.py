@@ -259,7 +259,7 @@ def safe_group(body):
 def monochrome_d():
     """Single-colour silhouette for themed icons: the pad and its fruit (badges would turn into noise)."""
     def ell(cx, cy, rx, ry, rot=0):
-        e = affinity.scale(Point(cx, cy).buffer(1, resolution=64), rx, ry)
+        e = affinity.scale(Point(cx, cy).buffer(1, resolution=24), rx, ry)
         return affinity.rotate(e, rot, origin=(cx, cy)) if rot else e
 
     # Centred version of the pad + fruit, a bit larger since it stands alone.
@@ -268,11 +268,12 @@ def monochrome_d():
     spines = unary_union([
         Polygon([(x - 1.1, y), (x + 1.1, y), (x, y - 3.4)]) for x, y in ((43, 45), (57, 42), (40, 62), (52, 55), (61, 66), (47, 74), (57, 80))
     ])
-    shape = unary_union([pad.difference(fruit.buffer(1.8)).difference(spines), fruit])
+    # simplify() keeps the outline visually identical while cutting the path size (lint: VectorPath).
+    shape = unary_union([pad.difference(fruit.buffer(1.8)).difference(spines), fruit]).simplify(0.05)
 
     def ring(c):
         pts = list(c.coords)[:-1]
-        return "M" + " L".join(f"{x:.2f},{y:.2f}" for x, y in pts) + " Z"
+        return "M" + " L".join(f"{x:.1f},{y:.1f}" for x, y in pts) + " Z"
 
     polys = getattr(shape, "geoms", [shape])
     return " ".join(ring(p.exterior) + "".join(" " + ring(i) for i in p.interiors) for p in polys)

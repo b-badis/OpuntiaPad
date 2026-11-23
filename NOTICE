@@ -12,6 +12,7 @@ It includes third-party software and data distributed under their own licenses:
   language-textmate module. Source: https://github.com/eclipse/tm4e
 - Joni and JCodings (MIT), the JRuby project — https://github.com/jruby/joni
 - Gson (Apache-2.0), Copyright 2008 Google Inc.
+- SnakeYAML Engine (Apache-2.0), Copyright (c) 2018, SnakeYAML — https://bitbucket.org/snakeyaml/snakeyaml-engine
 - AndroidX, Jetpack Compose, Material components and icons (Apache-2.0), The Android Open Source Project
 - Kotlin standard library and kotlinx.coroutines (Apache-2.0), JetBrains s.r.o. and contributors
 - 88 TextMate grammars and 14 themes from the tm-grammars / tm-themes packages (MIT,

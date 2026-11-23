@@ -91,6 +91,13 @@
                 <data android:mimeType="application/vnd.google-earth.kml+xml" />
             </intent-filter>
 
+            <!-- "Open in OpuntiaPad" in the text-selection menu of other apps. -->
+            <intent-filter android:label="@string/process_text_label">
+                <action android:name="android.intent.action.PROCESS_TEXT" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+
             <!-- "Share → OpuntiaPad" (files or plain text). -->
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />

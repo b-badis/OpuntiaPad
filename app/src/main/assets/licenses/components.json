@@ -1,12 +1,76 @@
 {
   "components": [
-    { "name": "Sora Editor", "detail": "io.github.rosemoe:editor, language-textmate", "copyright": "Copyright (C) 2020-2025 Rosemoe", "license": "LGPL-2.1", "url": "https://github.com/Rosemoe/sora-editor", "file": "LGPL-2.1.txt" },
-    { "name": "Eclipse TM4E", "detail": "TextMate engine bundled in Sora's language-textmate", "copyright": "Copyright (c) 2015-2017 Angelo ZERR, (c) 2022 Sebastian Thomschke, (c) 2023 Vegard IT GmbH and others; initial code (C) Microsoft Corporation and (c) 2013 GitHub Inc.", "license": "EPL-2.0", "url": "https://github.com/eclipse/tm4e", "file": "EPL-2.0.txt" },
-    { "name": "Joni & JCodings", "detail": "Regular-expression engine and encodings", "copyright": "The Joni and JCodings authors (JRuby project)", "license": "MIT", "url": "https://github.com/jruby/joni", "file": "MIT-joni-jcodings.txt" },
-    { "name": "Gson", "detail": "com.google.code.gson:gson", "copyright": "Copyright 2008 Google Inc.", "license": "Apache-2.0", "url": "https://github.com/google/gson", "file": "Apache-2.0.txt" },
-    { "name": "AndroidX, Jetpack Compose & Material", "detail": "Core, AppCompat, Activity, Lifecycle, DataStore, Compose UI, Material 3, Material Icons", "copyright": "Copyright The Android Open Source Project", "license": "Apache-2.0", "url": "https://developer.android.com/jetpack/androidx", "file": "Apache-2.0.txt" },
-    { "name": "Kotlin & kotlinx.coroutines", "detail": "Standard library and coroutines", "copyright": "Copyright JetBrains s.r.o. and Kotlin Programming Language contributors", "license": "Apache-2.0", "url": "https://kotlinlang.org", "file": "Apache-2.0.txt" },
-    { "name": "TextMate grammars", "detail": "88 syntax grammars via the tm-grammars package (MIT) — each keeps its upstream license", "copyright": "Copyright (c) 2021 Pine Wu, (c) 2023 Anthony Fu, and the upstream grammar authors", "license": "MIT + upstream licenses", "url": "https://github.com/shikijs/textmate-grammars-themes", "file": "textmate-grammars.txt" },
-    { "name": "TextMate themes", "detail": "14 colour themes via the tm-themes package (MIT) — each keeps its upstream license", "copyright": "Copyright (c) 2021 Pine Wu, (c) 2023 Anthony Fu, and the upstream theme authors", "license": "MIT + upstream licenses", "url": "https://github.com/shikijs/textmate-grammars-themes", "file": "textmate-themes.txt" }
+    {
+      "name": "Sora Editor",
+      "detail": "io.github.rosemoe:editor, language-textmate",
+      "copyright": "Copyright (C) 2020-2025 Rosemoe",
+      "license": "LGPL-2.1",
+      "url": "https://github.com/Rosemoe/sora-editor",
+      "file": "LGPL-2.1.txt"
+    },
+    {
+      "name": "Eclipse TM4E",
+      "detail": "TextMate engine bundled in Sora's language-textmate",
+      "copyright": "Copyright (c) 2015-2017 Angelo ZERR, (c) 2022 Sebastian Thomschke, (c) 2023 Vegard IT GmbH and others; initial code (C) Microsoft Corporation and (c) 2013 GitHub Inc.",
+      "license": "EPL-2.0",
+      "url": "https://github.com/eclipse/tm4e",
+      "file": "EPL-2.0.txt"
+    },
+    {
+      "name": "Joni & JCodings",
+      "detail": "Regular-expression engine and encodings",
+      "copyright": "The Joni and JCodings authors (JRuby project)",
+      "license": "MIT",
+      "url": "https://github.com/jruby/joni",
+      "file": "MIT-joni-jcodings.txt"
+    },
+    {
+      "name": "Gson",
+      "detail": "com.google.code.gson:gson",
+      "copyright": "Copyright 2008 Google Inc.",
+      "license": "Apache-2.0",
+      "url": "https://github.com/google/gson",
+      "file": "Apache-2.0.txt"
+    },
+    {
+      "name": "SnakeYAML Engine",
+      "detail": "org.snakeyaml:snakeyaml-engine — YAML 1.2 parser used for JSON ↔ YAML conversion",
+      "copyright": "Copyright (c) 2018, SnakeYAML",
+      "license": "Apache-2.0",
+      "url": "https://bitbucket.org/snakeyaml/snakeyaml-engine",
+      "file": "Apache-2.0.txt"
+    },
+    {
+      "name": "AndroidX, Jetpack Compose & Material",
+      "detail": "Core, AppCompat, Activity, Lifecycle, DataStore, Compose UI, Material 3, Material Icons",
+      "copyright": "Copyright The Android Open Source Project",
+      "license": "Apache-2.0",
+      "url": "https://developer.android.com/jetpack/androidx",
+      "file": "Apache-2.0.txt"
+    },
+    {
+      "name": "Kotlin & kotlinx.coroutines",
+      "detail": "Standard library and coroutines",
+      "copyright": "Copyright JetBrains s.r.o. and Kotlin Programming Language contributors",
+      "license": "Apache-2.0",
+      "url": "https://kotlinlang.org",
+      "file": "Apache-2.0.txt"
+    },
+    {
+      "name": "TextMate grammars",
+      "detail": "88 syntax grammars via the tm-grammars package (MIT) — each keeps its upstream license",
+      "copyright": "Copyright (c) 2021 Pine Wu, (c) 2023 Anthony Fu, and the upstream grammar authors",
+      "license": "MIT + upstream licenses",
+      "url": "https://github.com/shikijs/textmate-grammars-themes",
+      "file": "textmate-grammars.txt"
+    },
+    {
+      "name": "TextMate themes",
+      "detail": "14 colour themes via the tm-themes package (MIT) — each keeps its upstream license",
+      "copyright": "Copyright (c) 2021 Pine Wu, (c) 2023 Anthony Fu, and the upstream theme authors",
+      "license": "MIT + upstream licenses",
+      "url": "https://github.com/shikijs/textmate-grammars-themes",
+      "file": "textmate-themes.txt"
+    }
   ]
 }

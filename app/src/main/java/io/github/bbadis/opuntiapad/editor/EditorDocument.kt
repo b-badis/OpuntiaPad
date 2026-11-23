@@ -8,6 +8,7 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import io.github.bbadis.opuntiapad.core.language.Language
+import io.github.bbadis.opuntiapad.core.text.LargeFilePolicy
 import io.github.bbadis.opuntiapad.core.text.LineEnding
 import io.github.rosemoe.sora.text.Content
 import java.nio.charset.Charset
@@ -28,6 +29,8 @@ class EditorDocument(
     lineEnding: LineEnding,
     writable: Boolean,
     val mimeType: String? = null,
+    /** True when restored from a draft: the text differs from what is saved on disk. */
+    restoredUnsaved: Boolean = false,
 ) {
     var uri by mutableStateOf(uri)
     var name by mutableStateOf(name)
@@ -42,9 +45,12 @@ class EditorDocument(
     /** User-controlled view mode: prevents accidental edits. */
     var readOnly by mutableStateOf(false)
 
-    private var savedVersion by mutableLongStateOf(content.documentVersion)
+    private var savedVersion by mutableLongStateOf(if (restoredUnsaved) -1L else content.documentVersion)
     var version by mutableLongStateOf(content.documentVersion)
         private set
+
+    /** Syntax colouring; off by default for very large files (see LargeFilePolicy). */
+    var highlighting by mutableStateOf(LargeFilePolicy.highlightByDefault(language.id, content.length))
 
     /** Selection to restore when the tab becomes active again. */
     var selectionLine by mutableIntStateOf(0)

@@ -18,6 +18,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import io.github.bbadis.opuntiapad.core.language.EditorTheme
 import io.github.bbadis.opuntiapad.core.settings.EditorSettings
 import io.github.rosemoe.sora.event.ContentChangeEvent
+import io.github.rosemoe.sora.lang.EmptyLanguage
 import io.github.rosemoe.sora.event.PublishSearchResultEvent
 import io.github.rosemoe.sora.event.SelectionChangeEvent
 import io.github.rosemoe.sora.event.TextSizeChangeEvent
@@ -116,11 +117,17 @@ fun CodeEditorHost(
         themeReady = true
     }
 
-    LaunchedEffect(document.id, document.language, grammarsReady, themeReady, settings.tabSize, settings.useSpaces, settings.autoComplete) {
+    LaunchedEffect(
+        document.id, document.language, document.highlighting, grammarsReady, themeReady,
+        settings.tabSize, settings.useSpaces, settings.autoComplete,
+    ) {
         if (!themeReady) return@LaunchedEffect
-        editor.setEditorLanguage(
-            TextMateSupport.createLanguage(document.language, settings.tabSize, settings.useSpaces, settings.autoComplete),
-        )
+        val language = if (document.highlighting) {
+            TextMateSupport.createLanguage(document.language, settings.tabSize, settings.useSpaces, settings.autoComplete)
+        } else {
+            EmptyLanguage() // large file: colouring is opt-in (LargeFilePolicy)
+        }
+        editor.setEditorLanguage(language)
     }
 
     LaunchedEffect(settings.fontSize) { controller.setZoom(settings.fontSize) }

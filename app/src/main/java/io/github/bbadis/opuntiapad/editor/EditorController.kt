@@ -6,9 +6,12 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import io.github.bbadis.opuntiapad.core.text.LineEdits
 import io.github.rosemoe.sora.widget.CodeEditor
 import io.github.rosemoe.sora.widget.EditorSearcher
 import io.github.rosemoe.sora.widget.SelectionMovement
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 data class SearchQuery(
     val text: String = "",
@@ -149,5 +152,98 @@ class EditorController {
     fun setZoom(sizeSp: Float) {
         fontSize = sizeSp
         editor?.setTextSize(sizeSp)
+    }
+
+    // --- Text editing helpers used by the Tools sheet, the symbol bar and shortcuts ---------------
+
+    /** True while a long transformation (formatting a big file…) runs in the background. */
+    var busy by mutableStateOf(false)
+        private set
+
+    val hasSelection: Boolean get() = editor?.cursor?.isSelected == true
+
+    fun selectedText(): String? {
+        val e = editor ?: return null
+        val c = e.cursor
+        return if (c.isSelected) e.text.substring(c.left, c.right) else null
+    }
+
+    /**
+     * Transforms the selection, or the whole document if nothing is selected, as one undoable edit.
+     * The transformation runs off the main thread so big documents don't freeze the UI.
+     * @return the failure, if [transform] threw (e.g. invalid JSON).
+     */
+    suspend fun transform(transform: (String) -> String): Throwable? {
+        val e = editor ?: return null
+        if (!e.isEditable) return null
+        val c = e.cursor
+        val selection = c.isSelected
+        val startLine = if (selection) c.leftLine else 0
+        val startColumn = if (selection) c.leftColumn else 0
+        val endLine = if (selection) c.rightLine else e.text.lineCount - 1
+        val endColumn = if (selection) c.rightColumn else e.text.getColumnCount(endLine)
+        val input = if (selection) e.text.substring(c.left, c.right) else e.text.toString()
+        busy = true
+        val result = try {
+            withContext(Dispatchers.Default) { runCatching { transform(input) } }
+        } finally {
+            busy = false
+        }
+        val output = result.getOrElse { return it }
+        if (output == input || editor !== e) return null
+        e.text.replace(startLine, startColumn, endLine, endColumn, output)
+        if (selection) {
+            val end = e.text.indexer.getCharPosition(e.text.getCharIndex(startLine, startColumn) + output.length)
+            e.setSelectionRegion(startLine, startColumn, end.line, end.column)
+        } else {
+            e.setSelection(0, 0)
+        }
+        refresh()
+        return null
+    }
+
+    /** Comments or uncomments the lines touched by the selection (or the caret line). */
+    fun toggleComment(lineComment: String?, blockComment: Pair<String, String>?, separator: String): Boolean {
+        if (lineComment == null && blockComment == null) return false
+        editLines(separator) { lines, range ->
+            val edited = LineEdits.toggleComment(lines.subList(range.first, range.last + 1), lineComment, blockComment)
+            Edit(lines.subList(0, range.first) + edited + lines.subList(range.last + 1, lines.size), range)
+        }
+        return true
+    }
+
+    fun duplicateLines(separator: String) = editLines(separator) { lines, range ->
+        val size = range.last - range.first + 1
+        Edit(LineEdits.duplicate(lines, range), (range.first + size)..(range.last + size))
+    }
+
+    fun moveLines(delta: Int, separator: String) = editLines(separator) { lines, range ->
+        LineEdits.move(lines, range, delta)?.let { Edit(it, (range.first + delta)..(range.last + delta)) }
+    }
+
+    private data class Edit(val lines: List<String>, val selectedLines: IntRange)
+
+    /**
+     * Applies a line-based edit to a small window around the selected lines (never the whole file),
+     * as a single undoable change, then reselects the affected lines.
+     */
+    private fun editLines(separator: String, edit: (List<String>, IntRange) -> Edit?) {
+        val e = editor ?: return
+        if (!e.isEditable) return
+        val text = e.text
+        val c = e.cursor
+        val first = c.leftLine
+        // A selection ending at column 0 doesn't include that last line.
+        val last = if (c.isSelected && c.rightColumn == 0 && c.rightLine > c.leftLine) c.rightLine - 1 else c.rightLine
+        val windowStart = (first - 1).coerceAtLeast(0)
+        val windowEnd = (last + 1).coerceAtMost(text.lineCount - 1)
+        val window = (windowStart..windowEnd).map { text.getLineString(it) }
+        val result = edit(window, (first - windowStart)..(last - windowStart)) ?: return
+        text.replace(windowStart, 0, windowEnd, text.getColumnCount(windowEnd), result.lines.joinToString(separator))
+        val selFirst = windowStart + result.selectedLines.first
+        val selLast = windowStart + result.selectedLines.last
+        e.setSelectionRegion(selFirst, 0, selLast, text.getColumnCount(selLast))
+        e.ensureSelectionVisible()
+        refresh()
     }
 }

@@ -11,6 +11,9 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.IntentCompat
+import androidx.core.content.pm.ShortcutInfoCompat
+import androidx.core.content.pm.ShortcutManagerCompat
+import androidx.core.graphics.drawable.IconCompat
 import io.github.bbadis.opuntiapad.ui.OpuntiaPadRoot
 import java.io.File
 import io.github.bbadis.opuntiapad.ui.MainViewModel
@@ -23,11 +26,11 @@ class MainActivity : AppCompatActivity() {
 
     private val viewModel: MainViewModel by viewModels()
 
-    /** Set by the editor screen to receive Ctrl+key shortcuts from hardware keyboards. */
+    /** Set by the editor screen to receive Ctrl/Alt+key shortcuts from hardware keyboards. */
     var shortcutHandler: ((KeyEvent) -> Boolean)? = null
 
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
-        if (event.action == KeyEvent.ACTION_DOWN && event.isCtrlPressed && event.repeatCount == 0 &&
+        if (event.action == KeyEvent.ACTION_DOWN && (event.isCtrlPressed || event.isAltPressed) &&
             shortcutHandler?.invoke(event) == true
         ) {
             return true
@@ -40,11 +43,28 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         if (savedInstanceState == null) handleIntent(intent)
         setContent { OpuntiaPadRoot(viewModel) }
+        publishShortcuts()
     }
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         handleIntent(intent)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        // Android may close the app while it's in the background: keep tabs and unsaved changes.
+        viewModel.saveSession()
+    }
+
+    /** Long-press launcher shortcut: "New file". */
+    private fun publishShortcuts() {
+        val newFile = ShortcutInfoCompat.Builder(this, SHORTCUT_NEW_FILE)
+            .setShortLabel(getString(R.string.action_new))
+            .setIcon(IconCompat.createWithResource(this, R.drawable.ic_shortcut_new_file))
+            .setIntent(Intent(this, MainActivity::class.java).setAction(ACTION_NEW_FILE))
+            .build()
+        runCatching { ShortcutManagerCompat.setDynamicShortcuts(this, listOf(newFile)) }
     }
 
     // Only URIs are read from incoming intents; nothing is ever re-launched from them.
@@ -62,6 +82,14 @@ class MainActivity : AppCompatActivity() {
                         viewModel.openText(it.toString(), intent.getStringExtra(Intent.EXTRA_SUBJECT) ?: intent.getStringExtra(Intent.EXTRA_TITLE))
                     }
                 }
+            }
+            ACTION_NEW_FILE -> {
+                ShortcutManagerCompat.reportShortcutUsed(this, SHORTCUT_NEW_FILE)
+                viewModel.newFile()
+            }
+            // "Open in OpuntiaPad" in the text-selection menu of other apps.
+            Intent.ACTION_PROCESS_TEXT -> intent.getCharSequenceExtra(Intent.EXTRA_PROCESS_TEXT)?.let {
+                viewModel.openText(it.toString(), null)
             }
             Intent.ACTION_SEND_MULTIPLE -> {
                 IntentCompat.getParcelableArrayListExtra(intent, Intent.EXTRA_STREAM, Uri::class.java)
@@ -81,5 +109,10 @@ class MainActivity : AppCompatActivity() {
             if (path.startsWith(privateDir)) return
         }
         viewModel.open(uri)
+    }
+
+    private companion object {
+        const val ACTION_NEW_FILE = "io.github.bbadis.opuntiapad.action.NEW_FILE"
+        const val SHORTCUT_NEW_FILE = "new_file"
     }
 }

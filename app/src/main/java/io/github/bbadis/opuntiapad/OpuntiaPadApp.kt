@@ -3,6 +3,7 @@ package io.github.bbadis.opuntiapad
 import android.app.Application
 import io.github.bbadis.opuntiapad.core.files.DocumentRepository
 import io.github.bbadis.opuntiapad.core.language.LanguageCatalog
+import io.github.bbadis.opuntiapad.core.session.SessionStore
 import io.github.bbadis.opuntiapad.core.settings.SettingsRepository
 import io.github.bbadis.opuntiapad.editor.TextMateSupport
 
@@ -12,6 +13,7 @@ class OpuntiaPadApp : Application() {
     val settingsRepository by lazy { SettingsRepository(this) }
     val documentRepository by lazy { DocumentRepository(this) }
     val catalog by lazy { LanguageCatalog.load(assets) }
+    val sessionStore by lazy { SessionStore(this) }
 
     override fun onCreate() {
         super.onCreate()

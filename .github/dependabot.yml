@@ -18,6 +18,10 @@ updates:
     groups:
       gradle-minor-and-patch:
         update-types: [minor, patch]
+    ignore:
+      # SnakeYAML Engine 3.x needs Android 13+ APIs (Optional.isEmpty); the app supports Android 8+.
+      - dependency-name: "org.snakeyaml:snakeyaml-engine"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: github-actions
     directory: /

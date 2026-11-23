@@ -90,7 +90,14 @@ import io.github.bbadis.opuntiapad.ui.components.HomeContent
 import io.github.bbadis.opuntiapad.ui.components.SearchPanel
 import io.github.bbadis.opuntiapad.ui.components.StatusBar
 import io.github.bbadis.opuntiapad.ui.components.SymbolBar
+import io.github.bbadis.opuntiapad.ui.components.ChecksumsDialog
+import io.github.bbadis.opuntiapad.ui.components.LargeFileBanner
+import io.github.bbadis.opuntiapad.ui.components.ToolsSheet
 import io.github.bbadis.opuntiapad.ui.components.UnsavedChangesDialog
+import io.github.bbadis.opuntiapad.ui.tools.Checksums
+import io.github.bbadis.opuntiapad.ui.tools.DocumentTools
+import io.github.bbadis.opuntiapad.core.text.DocumentFormatter
+import androidx.compose.material.icons.outlined.AutoFixHigh
 import kotlinx.coroutines.launch
 
 private enum class EditorDialog { NONE, GO_TO_LINE, LANGUAGE, ENCODING, LINE_ENDING, EXIT }
@@ -118,6 +125,9 @@ fun EditorScreen(
 
     var searchVisible by rememberSaveable { mutableStateOf(false) }
     var dialog by rememberSaveable { mutableStateOf(EditorDialog.NONE) }
+    var toolsVisible by rememberSaveable { mutableStateOf(false) }
+    var checksums by remember { mutableStateOf<Checksums?>(null) }
+    val tools = remember(viewModel, controller) { DocumentTools(viewModel, controller, scope) { viewModel.settings.value } }
     var saveAsTarget by rememberSaveable { mutableLongStateOf(-1L) }
 
     val openLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris ->
@@ -132,7 +142,15 @@ fun EditorScreen(
     LaunchedEffect(viewModel) {
         viewModel.uiEvents.collect { event ->
             when (event) {
-                is UiEvent.Message -> snackbar.showSnackbar(resources.getString(event.text.res, *event.text.args.toTypedArray()))
+                is UiEvent.Message -> {
+                    val args = event.text.args.toTypedArray()
+                    val text = if (event.plural) {
+                        resources.getQuantityString(event.text.res, (args.first() as Number).toInt(), *args)
+                    } else {
+                        resources.getString(event.text.res, *args)
+                    }
+                    snackbar.showSnackbar(text)
+                }
                 is UiEvent.RequestSaveAs -> {
                     saveAsTarget = event.documentId
                     saveAsLauncher.launch(SaveAsRequest(event.suggestedName, mimeFor(event.suggestedName, event.mimeType)))
@@ -144,7 +162,9 @@ fun EditorScreen(
     // Hardware keyboard shortcuts (Ctrl+S, Ctrl+F…). Ctrl+Z/Y/C/V/X/A are handled by the editor itself.
     DisposableEffect(activity, document) {
         val main = activity as? MainActivity
-        main?.shortcutHandler = { event -> handleShortcut(event, viewModel, controller, openFile, { searchVisible = true }, { dialog = EditorDialog.GO_TO_LINE }) }
+        main?.shortcutHandler = { event ->
+            handleShortcut(event, viewModel, controller, tools, openFile, { searchVisible = true }, { dialog = EditorDialog.GO_TO_LINE })
+        }
         onDispose { main?.shortcutHandler = null }
     }
 
@@ -198,7 +218,7 @@ fun EditorScreen(
                         onLanguage = { dialog = EditorDialog.LANGUAGE },
                         onEncoding = { dialog = EditorDialog.ENCODING },
                         onLineEnding = { dialog = EditorDialog.LINE_ENDING },
-                        onFormatJson = { minify -> document?.let { viewModel.formatJson(it, minify) } },
+                        onTools = { toolsVisible = true },
                         onToggleReadOnly = { document?.let(viewModel::toggleReadOnly) },
                         onToggleWordWrap = { viewModel.updateSettings { it.copy(wordWrap = !it.wordWrap) } },
                         onZoom = { delta ->
@@ -218,12 +238,15 @@ fun EditorScreen(
                         .imePadding()
                         .fillMaxSize(),
                 ) {
-                    if (viewModel.loading) LinearProgressIndicator(Modifier.fillMaxWidth())
+                    if (viewModel.loading || controller.busy) LinearProgressIndicator(Modifier.fillMaxWidth())
                     if (viewModel.tabs.size > 1 || (viewModel.tabs.isNotEmpty() && medium)) {
                         DocumentTabs(viewModel.tabs, viewModel.activeIndex, viewModel::select, viewModel::requestClose)
                     }
                     AnimatedVisibility(visible = searchVisible && document != null) {
                         SearchPanel(controller, onClose = { searchVisible = false })
+                    }
+                    if (document != null && !document.highlighting && !document.language.isPlainText) {
+                        LargeFileBanner(onEnable = { viewModel.setHighlighting(document, true) })
                     }
                     Box(Modifier.weight(1f).fillMaxWidth()) {
                         if (document != null) {
@@ -249,7 +272,14 @@ fun EditorScreen(
                         }
                     }
                     if (document != null) {
-                        if (settings.symbolBar && !document.readOnly) SymbolBar(controller)
+                        if (settings.symbolBar && !document.readOnly) {
+                            SymbolBar(
+                                controller = controller,
+                                onToggleComment = { tools.toggleComment(document) },
+                                onDuplicate = { tools.duplicateLines(document) },
+                                onMove = { delta -> tools.moveLines(document, delta) },
+                            )
+                        }
                         StatusBar(
                             document = document,
                             controller = controller,
@@ -286,6 +316,23 @@ fun EditorScreen(
             onSave = viewModel::saveAndClose,
             onDiscard = viewModel::discardAndClose,
             onDismiss = viewModel::dismissClose,
+        )
+    }
+
+    if (toolsVisible && document != null) {
+        ToolsSheet(
+            document = document,
+            tools = tools,
+            hasSelection = controller.hasSelection,
+            onShowChecksums = { scope.launch { checksums = tools.checksums(document) } },
+            onDismiss = { toolsVisible = false },
+        )
+    }
+    checksums?.let { values ->
+        ChecksumsDialog(
+            checksums = values,
+            onCopied = { viewModel.showMessage(R.string.msg_copied) },
+            onDismiss = { checksums = null },
         )
     }
 
@@ -375,7 +422,7 @@ private fun EditorTopBar(
     onLanguage: () -> Unit,
     onEncoding: () -> Unit,
     onLineEnding: () -> Unit,
-    onFormatJson: (minify: Boolean) -> Unit,
+    onTools: () -> Unit,
     onToggleReadOnly: () -> Unit,
     onToggleWordWrap: () -> Unit,
     onZoom: (Float) -> Unit,
@@ -422,6 +469,7 @@ private fun EditorTopBar(
                         Icon(Icons.AutoMirrored.Filled.Redo, stringResource(R.string.action_redo))
                     }
                 }
+                IconButton(onClick = onTools) { Icon(Icons.Outlined.AutoFixHigh, stringResource(R.string.tools_title)) }
                 IconButton(onClick = onSearch) { Icon(Icons.Filled.Search, stringResource(R.string.action_search)) }
                 IconButton(onClick = onSave, enabled = document.isDirty || document.isUntitled) {
                     Icon(Icons.Outlined.Save, stringResource(R.string.action_save))
@@ -463,10 +511,7 @@ private fun EditorTopBar(
                         }
                         item(stringResource(R.string.action_go_to_line), true, onGoToLine)
                         item(stringResource(R.string.action_select_all), true) { controller.selectAll() }
-                        if (document.language.id in JSON_LANGUAGES) {
-                            item(stringResource(R.string.action_format_json), !document.readOnly) { onFormatJson(false) }
-                            item(stringResource(R.string.action_minify_json), !document.readOnly) { onFormatJson(true) }
-                        }
+                        item(stringResource(R.string.tools_title), true, onTools)
                         HorizontalDivider()
                         item(stringResource(R.string.action_language, document.language.name), true, onLanguage)
                         item(stringResource(R.string.action_encoding, document.charset.name()), !document.isUntitled, onEncoding)
@@ -488,18 +533,36 @@ private fun EditorTopBar(
     )
 }
 
-private val JSON_LANGUAGES = setOf("json", "jsonc", "json5")
 
 private fun handleShortcut(
     event: KeyEvent,
     viewModel: MainViewModel,
     controller: EditorController,
+    tools: DocumentTools,
     openFile: () -> Unit,
     showSearch: () -> Unit,
     showGoToLine: () -> Unit,
 ): Boolean {
     val doc = viewModel.activeDocument
+    // Alt+↑ / Alt+↓ move the current lines (like most desktop editors).
+    if (event.isAltPressed && !event.isCtrlPressed) {
+        val delta = when (event.keyCode) {
+            KeyEvent.KEYCODE_DPAD_UP -> -1
+            KeyEvent.KEYCODE_DPAD_DOWN -> 1
+            else -> return false
+        }
+        if (doc == null || doc.readOnly) return false
+        tools.moveLines(doc, delta)
+        return true
+    }
+    if (!event.isCtrlPressed) return false
     return when (event.keyCode) {
+        KeyEvent.KEYCODE_SLASH -> { if (doc != null && !doc.readOnly) tools.toggleComment(doc); doc != null }
+        KeyEvent.KEYCODE_D -> { if (doc != null && !doc.readOnly) tools.duplicateLines(doc); doc != null }
+        KeyEvent.KEYCODE_F if event.isShiftPressed && doc != null && DocumentFormatter.canFormat(doc.language.id) -> {
+            if (!doc.readOnly) tools.format(doc)
+            true
+        }
         KeyEvent.KEYCODE_S -> {
             doc?.let { if (event.isShiftPressed) viewModel.requestSaveAs(it) else viewModel.save(it) }
             true

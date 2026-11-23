@@ -22,7 +22,11 @@ syntaxique, des onglets, la recherche/remplacement et le zoom à deux doigts.
 - 🎨 **Coloration syntaxique** de 73 langages grâce aux grammaires TextMate de VS Code (YAML, JSON, SQL, PL/SQL, XML, HTML, CSS, Markdown, Python, Java, Kotlin, JS/TS, Go, Rust, C/C++, C#, PHP, Shell, Dockerfile, Terraform, TOML, INI, `.env`, logs, CSV…).
 - 🧠 **Détection automatique du langage** par nom de fichier, extension, type MIME ou contenu ; modifiable à tout moment.
 - ✏️ **Édition complète** : annuler/rétablir par fichier, poignées de sélection, indentation, auto-indentation, fermeture automatique des crochets, barre Tab & symboles au-dessus du clavier.
-- 🔎 **Rechercher & remplacer** : casse, mot entier, expressions régulières, compteur d'occurrences.
+- 🔎 **Rechercher & remplacer** : casse, mot entier, expressions régulières (groupes `$1` dans le remplacement), compteur d'occurrences.
+- 🪄 **Outils** : formater JSON, XML et SQL ; minifier ; convertir JSON ↔ YAML ; trier, dédoublonner, nettoyer les lignes ; changer la casse ; tabulations ↔ espaces ; Base64, URL ; sommes de contrôle SHA-256/SHA-1/MD5 — sur la sélection ou tout le document, en une seule annulation.
+- 🧩 **Actions sur les lignes** : commenter, dupliquer, déplacer (`Ctrl+/`, `Ctrl+D`, `Alt+↑/↓`).
+- 💾 **Reprise** : onglets et modifications non enregistrées restaurés au redémarrage.
+- ⚡ **Rapide sur les gros fichiers** : grammaires chargées à la demande, coloration optionnelle pour les très gros fichiers.
 - 🗂️ **Onglets** façon Notepad++, indicateur de modifications, fichiers récents.
 - 🔢 **Numéros de ligne**, aller à la ligne, surlignage de la ligne courante, défilement adhérent, affichage des espaces.
 - 🔍 **Zoom** à deux doigts, par menu ou `Ctrl +/-`.

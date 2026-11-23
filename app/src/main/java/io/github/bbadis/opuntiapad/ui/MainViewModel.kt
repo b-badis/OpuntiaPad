@@ -2,6 +2,7 @@ package io.github.bbadis.opuntiapad.ui
 
 import android.app.Application
 import android.net.Uri
+import androidx.core.net.toUri
 import androidx.annotation.StringRes
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -13,10 +14,12 @@ import androidx.lifecycle.viewModelScope
 import io.github.bbadis.opuntiapad.OpuntiaPadApp
 import io.github.bbadis.opuntiapad.R
 import io.github.bbadis.opuntiapad.core.files.FileTooLargeException
+import io.github.bbadis.opuntiapad.core.session.SavedSession
+import io.github.bbadis.opuntiapad.core.session.SavedTab
+import io.github.bbadis.opuntiapad.core.session.SessionStore
 import io.github.bbadis.opuntiapad.core.language.Language
 import io.github.bbadis.opuntiapad.core.settings.EditorSettings
 import io.github.bbadis.opuntiapad.core.settings.RecentFile
-import io.github.bbadis.opuntiapad.core.text.JsonFormatter
 import io.github.bbadis.opuntiapad.core.text.LineEnding
 import io.github.bbadis.opuntiapad.core.text.TextCodec
 import io.github.bbadis.opuntiapad.editor.EditorDocument
@@ -24,10 +27,12 @@ import io.github.bbadis.opuntiapad.editor.TextMateSupport
 import io.github.rosemoe.sora.text.Content
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -35,10 +40,12 @@ import kotlinx.coroutines.withContext
 import java.nio.charset.Charset
 
 /** A localisable message. */
-data class UiText(@param:StringRes val res: Int, val args: List<Any> = emptyList())
+/** A localisable message: a string resource, or a plurals resource when shown with `plural = true`. */
+data class UiText(val res: Int, val args: List<Any> = emptyList())
 
 sealed interface UiEvent {
-    data class Message(val text: UiText) : UiEvent
+    /** [plural]: [text] is a plurals resource whose quantity is its first argument. */
+    data class Message(val text: UiText, val plural: Boolean = false) : UiEvent
 
     /** The UI must ask the user for a destination (system "Save as" picker). */
     data class RequestSaveAs(val documentId: Long, val suggestedName: String, val mimeType: String) : UiEvent
@@ -78,8 +85,68 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private var fontSaveJob: Job? = null
     private var closeAfterSave: Long? = null
 
+    private val sessionStore = app.sessionStore
+
+    /** Restores the previous session once; files opened meanwhile (e.g. "Open with") wait for it. */
+    private val restoreJob: Job = viewModelScope.launch {
+        if (settingsRepository.settings.first().restoreSession) restoreSession()
+    }
+
     init {
         viewModelScope.launch { grammarsReady = TextMateSupport.awaitReady() }
+    }
+
+    // --- Session -----------------------------------------------------------------------------
+
+    private suspend fun restoreSession() {
+        val session = sessionStore.load() ?: return
+        var failed = 0
+        for (saved in session.tabs) {
+            val language = catalog.detector.byId(saved.languageId) ?: Language.PLAIN_TEXT
+            val charset = runCatching { Charset.forName(saved.charset) }.getOrDefault(TextCodec.UTF_8)
+            val lineEnding = runCatching { LineEnding.valueOf(saved.lineEnding) }.getOrDefault(LineEnding.LF)
+            val uri = saved.uri?.toUri()
+            val draft = saved.draft?.let { sessionStore.readDraft(it) }
+            val text: String = draft ?: uri?.let { u -> runCatching { documents.read(u, charset = charset).text }.getOrNull() } ?: run {
+                failed++
+                null
+            } ?: continue
+            val writable = uri != null && runCatching { documents.info(uri).writable }.getOrDefault(false)
+            tabs += EditorDocument(
+                id = nextId++, uri = uri, name = saved.name, content = withContext(Dispatchers.Default) { Content(text) },
+                language = language, charset = charset, hasBom = saved.hasBom, lineEnding = lineEnding, writable = writable,
+                restoredUnsaved = draft != null,
+            ).apply {
+                readOnly = saved.readOnly
+                selectionLine = saved.selectionLine
+                selectionColumn = saved.selectionColumn
+            }
+        }
+        if (tabs.isNotEmpty()) activeIndex = session.activeIndex.coerceIn(0, tabs.lastIndex)
+        if (failed > 0) events.trySend(UiEvent.Message(UiText(R.plurals.msg_restore_failed, listOf(failed)), plural = true))
+    }
+
+    /** Saves open tabs and unsaved changes (called when the app goes to the background). */
+    fun saveSession() {
+        viewModelScope.launch(NonCancellable) {
+            restoreJob.join()
+            if (!settings.value.restoreSession || tabs.isEmpty()) {
+                sessionStore.clear()
+                return@launch
+            }
+            val drafts = mutableMapOf<String, CharSequence>()
+            val saved = tabs.mapIndexed { index, doc ->
+                val keepDraft = (doc.isDirty || doc.isUntitled) && doc.content.length <= SessionStore.MAX_DRAFT_CHARS
+                val draftName = if (keepDraft) "draft-$index.txt" else null
+                if (draftName != null) drafts[draftName] = doc.content.toString()
+                SavedTab(
+                    uri = doc.uri?.toString(), name = doc.name, languageId = doc.language.id, charset = doc.charset.name(),
+                    hasBom = doc.hasBom, lineEnding = doc.lineEnding.name, readOnly = doc.readOnly,
+                    selectionLine = doc.selectionLine, selectionColumn = doc.selectionColumn, draft = draftName,
+                )
+            }.filter { it.uri != null || it.draft != null }
+            sessionStore.save(SavedSession(saved, activeIndex.coerceAtLeast(0)), drafts)
+        }
     }
 
     // --- Opening -----------------------------------------------------------------------------
@@ -90,6 +157,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             return
         }
         viewModelScope.launch {
+            restoreJob.join()
+            tabs.indexOfFirst { it.uri == uri }.takeIf { it >= 0 }?.let {
+                activeIndex = it
+                return@launch
+            }
             loading = true
             try {
                 if (persistPermission) documents.persistPermission(uri, write = true)
@@ -121,14 +193,35 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     /** Opens shared plain text (e.g. "Share → OpuntiaPad" from a chat app) as an untitled document. */
     fun openText(text: String, title: String?) {
-        val name = title?.takeIf { it.isNotBlank() } ?: nextUntitledName()
-        val language = catalog.detector.detect(title, null, text)
+        viewModelScope.launch {
+            restoreJob.join()
+            val name = title?.takeIf { it.isNotBlank() } ?: nextUntitledName()
+            val language = catalog.detector.detect(title, null, text)
+            addTab(newDocument(name, text, language))
+        }
+    }
+
+    /** Opens the result of a conversion (e.g. JSON → YAML) in a new untitled tab. */
+    fun openConverted(text: String, sourceName: String, languageId: String) {
+        val language = catalog.detector.byId(languageId) ?: Language.PLAIN_TEXT
+        val ext = language.extensions.firstOrNull() ?: "txt"
+        val name = sourceName.substringBeforeLast('.', sourceName) + "." + ext
         addTab(newDocument(name, text, language))
     }
 
     fun newFile() {
-        addTab(newDocument(nextUntitledName(), "", Language.PLAIN_TEXT))
+        viewModelScope.launch {
+            restoreJob.join()
+            addTab(newDocument(nextUntitledName(), "", Language.PLAIN_TEXT))
+        }
     }
+
+    fun setHighlighting(document: EditorDocument, enabled: Boolean) {
+        document.highlighting = enabled
+    }
+
+    /** Shows a localised message from the UI layer (e.g. a tool failure). */
+    fun showMessage(@StringRes res: Int, vararg args: Any) = message(res, *args)
 
     private fun newDocument(name: String, text: String, language: Language) = EditorDocument(
         id = nextId++, uri = null, name = name, content = Content(text), language = language,
@@ -280,17 +373,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         if (document.lineEnding == target) return
         replaceAll(document, LineEnding.convert(document.content, target))
         document.lineEnding = target
-    }
-
-    fun formatJson(document: EditorDocument, minify: Boolean) {
-        try {
-            val indent = if (settings.value.useSpaces) " ".repeat(settings.value.tabSize) else "\t"
-            val text = if (minify) JsonFormatter.minify(document.content) else JsonFormatter.format(document.content, indent)
-            replaceAll(document, if (document.lineEnding == LineEnding.LF) text else LineEnding.convert(text, document.lineEnding))
-        } catch (e: JsonFormatter.JsonSyntaxException) {
-            val line = document.content.indexer.getCharPosition(e.offset.coerceAtMost(document.content.length)).line + 1
-            message(R.string.msg_invalid_json, e.message.orEmpty(), line)
-        }
     }
 
     /** Replaces the whole text as a single undoable edit. */

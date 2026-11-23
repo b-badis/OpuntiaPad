@@ -24,6 +24,11 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.automirrored.outlined.Comment
+import androidx.compose.material.icons.outlined.ArrowDownward
+import androidx.compose.material.icons.outlined.ArrowUpward
+import androidx.compose.material.icons.outlined.ContentCopy
+import androidx.compose.material.icons.outlined.Speed
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -31,6 +36,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PrimaryScrollableTabRow
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -59,7 +66,13 @@ private val SYMBOLS = listOf(
 
 /** Row of keys that are awkward to reach on a phone keyboard. */
 @Composable
-fun SymbolBar(controller: EditorController, modifier: Modifier = Modifier) {
+fun SymbolBar(
+    controller: EditorController,
+    onToggleComment: () -> Unit,
+    onDuplicate: () -> Unit,
+    onMove: (delta: Int) -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Surface(color = MaterialTheme.colorScheme.surfaceContainer, modifier = modifier) {
         // Code is always laid out left-to-right, even in RTL locales.
         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
@@ -71,6 +84,11 @@ fun SymbolBar(controller: EditorController, modifier: Modifier = Modifier) {
                 item {
                     SymbolIcon(Icons.AutoMirrored.Filled.KeyboardTab, R.string.action_unindent, Modifier.rotate(180f)) { controller.unindent() }
                 }
+                item { SymbolIcon(Icons.AutoMirrored.Outlined.Comment, R.string.tools_toggle_comment, onClick = onToggleComment) }
+                item { SymbolIcon(Icons.Outlined.ContentCopy, R.string.tools_duplicate_line, onClick = onDuplicate) }
+                item { SymbolIcon(Icons.Outlined.ArrowUpward, R.string.tools_move_up) { onMove(-1) } }
+                item { SymbolIcon(Icons.Outlined.ArrowDownward, R.string.tools_move_down) { onMove(1) } }
+                item { VerticalDivider(Modifier.height(24.dp).padding(horizontal = 4.dp)) }
                 item { SymbolIcon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, R.string.action_move_left) { controller.move(SelectionMovement.LEFT) } }
                 item { SymbolIcon(Icons.AutoMirrored.Filled.KeyboardArrowRight, R.string.action_move_right) { controller.move(SelectionMovement.RIGHT) } }
                 item { SymbolIcon(Icons.Filled.KeyboardArrowUp, R.string.action_move_up) { controller.move(SelectionMovement.UP) } }
@@ -182,5 +200,21 @@ fun DocumentTabs(
             }
         }
         HorizontalDivider()
+    }
+}
+
+/** Shown above the editor when colouring was turned off for a very large file. */
+@Composable
+fun LargeFileBanner(onEnable: () -> Unit, modifier: Modifier = Modifier) {
+    Surface(color = MaterialTheme.colorScheme.secondaryContainer, modifier = modifier.fillMaxWidth()) {
+        Row(Modifier.padding(start = 16.dp, end = 8.dp, top = 4.dp, bottom = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+            Icon(Icons.Outlined.Speed, contentDescription = null, modifier = Modifier.size(20.dp))
+            Text(
+                stringResource(R.string.large_file_banner),
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.weight(1f).padding(horizontal = 12.dp),
+            )
+            TextButton(onClick = onEnable) { Text(stringResource(R.string.large_file_enable)) }
+        }
     }
 }

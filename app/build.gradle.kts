@@ -100,7 +100,8 @@ android {
         abortOnError = true
         warningsAsErrors = false
         checkReleaseBuilds = true
-        disable += setOf("MissingTranslation")
+        // Dependency updates are handled by Dependabot (with deliberate exceptions, see dependabot.yml).
+        disable += setOf("MissingTranslation", "NewerVersionAvailable", "GradleDependency")
     }
 }
 
@@ -160,6 +161,7 @@ dependencies {
     implementation(platform(libs.sora.bom))
     implementation(libs.sora.editor)
     implementation(libs.sora.language.textmate)
+    implementation(libs.snakeyaml.engine)
 
     testImplementation(libs.junit)
 

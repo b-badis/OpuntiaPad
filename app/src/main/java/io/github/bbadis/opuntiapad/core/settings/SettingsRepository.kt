@@ -34,6 +34,7 @@ data class EditorSettings(
     val symbolBar: Boolean = true,
     val stickyScroll: Boolean = false,
     val keepScreenOn: Boolean = false,
+    val restoreSession: Boolean = true,
 ) {
     companion object {
         const val MIN_FONT = 8f
@@ -66,6 +67,7 @@ class SettingsRepository(context: Context) {
         val symbolBar = booleanPreferencesKey("symbol_bar")
         val stickyScroll = booleanPreferencesKey("sticky_scroll")
         val keepScreenOn = booleanPreferencesKey("keep_screen_on")
+        val restoreSession = booleanPreferencesKey("restore_session")
         val recents = stringPreferencesKey("recent_files")
     }
 
@@ -91,6 +93,7 @@ class SettingsRepository(context: Context) {
             p[Keys.symbolBar] = s.symbolBar
             p[Keys.stickyScroll] = s.stickyScroll
             p[Keys.keepScreenOn] = s.keepScreenOn
+            p[Keys.restoreSession] = s.restoreSession
         }
     }
 
@@ -114,6 +117,7 @@ class SettingsRepository(context: Context) {
             symbolBar = this[Keys.symbolBar] ?: d.symbolBar,
             stickyScroll = this[Keys.stickyScroll] ?: d.stickyScroll,
             keepScreenOn = this[Keys.keepScreenOn] ?: d.keepScreenOn,
+            restoreSession = this[Keys.restoreSession] ?: d.restoreSession,
         )
     }
 

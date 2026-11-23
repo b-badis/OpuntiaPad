@@ -34,6 +34,8 @@ class DocumentRepository(context: Context) {
     private val appContext = context.applicationContext
     private val resolver: ContentResolver = appContext.contentResolver
 
+    // The URI is only queried and permission-checked, never launched (lint false positive, see isWritable).
+    @SuppressLint("UnsafeIntentLaunch")
     suspend fun info(uri: Uri): DocumentInfo = withContext(Dispatchers.IO) {
         var name: String? = null
         var size: Long? = null

@@ -100,6 +100,9 @@ fun SettingsScreen(
                     title = stringResource(R.string.settings_app_language),
                     summary = currentLanguage ?: stringResource(R.string.settings_language_system),
                 ) { dialog = SettingsDialog.APP_LANGUAGE }
+                SwitchSetting(R.string.settings_restore_session, R.string.settings_restore_session_summary, settings.restoreSession) { v ->
+                    onUpdate { it.copy(restoreSession = v) }
+                }
 
                 Section(R.string.settings_section_appearance)
                 ListRow(
